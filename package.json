@@ -1,0 +1,11 @@
+{
+  "name": "rush-hour",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Rush Hour sliding-block puzzle prototype",
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "generate": "node tools/generate.js",
+    "bundle": "node tools/bundle.js"
+  }
+}

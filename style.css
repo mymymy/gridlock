@@ -1,0 +1,311 @@
+/* Palette: concrete ground, tarmac board, yellow road marking, signal red. */
+:root {
+  --ground: #e4e8ec;
+  --panel: #f3f5f7;
+  --ink: #1d2126;
+  --muted: #56606b;
+  --rule: #c5ccd3;
+  --tarmac: #3a3f47;
+  --tarmac-edge: #262a30;
+  --cell-line: rgba(255, 255, 255, 0.07);
+  --marking: #f0c02e;
+  --red: #d6312a;
+  --focus: #1f6fd1;
+  --good: #2c8a57;
+  --shadow: rgba(18, 22, 28, 0.35);
+
+  --v1: #3b7bd6; --v2: #2e9f78; --v3: #e38d2a; --v4: #8a68cf;
+  --v5: #de6a9d; --v6: #33a4b6; --v7: #b48a4c; --v8: #78a03c;
+  --v9: #4b5ea8; --v10: #c2582f; --v11: #5d8e8a; --v12: #9c5a9a;
+
+  --font: 'Overpass', 'Helvetica Neue', Arial, sans-serif;
+  --mono: 'Overpass Mono', ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --ground: #14171b;
+    --panel: #1c2025;
+    --ink: #e9ecef;
+    --muted: #9aa4ae;
+    --rule: #2f353c;
+    --tarmac: #2c3036;
+    --tarmac-edge: #0c0e10;
+    --focus: #6aa8ff;
+    --good: #5cc98b;
+    --shadow: rgba(0, 0, 0, 0.6);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ground: #14171b;
+  --panel: #1c2025;
+  --ink: #e9ecef;
+  --muted: #9aa4ae;
+  --rule: #2f353c;
+  --tarmac: #2c3036;
+  --tarmac-edge: #0c0e10;
+  --focus: #6aa8ff;
+  --good: #5cc98b;
+  --shadow: rgba(0, 0, 0, 0.6);
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; }
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font: 400 15px/1.5 var(--font);
+  padding: 0 16px;
+  -webkit-tap-highlight-color: transparent;
+}
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.app {
+  max-width: 460px;
+  margin: 0 auto;
+  padding-block: 24px 40px;
+  display: grid;
+  gap: 28px;
+}
+
+/* Header */
+.top { display: grid; gap: 2px; }
+.brand {
+  margin: 0;
+  font-weight: 900;
+  font-size: 34px;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+.brand::after {
+  content: '';
+  display: block;
+  width: 56px;
+  height: 6px;
+  margin-top: 8px;
+  background: repeating-linear-gradient(90deg, var(--marking) 0 14px, transparent 14px 22px);
+}
+.card-label { margin: 6px 0 0; color: var(--muted); font-weight: 600; }
+.tier { color: var(--ink); }
+
+/* Board */
+.play { display: grid; gap: 16px; }
+.board-wrap { position: relative; }
+.board {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  aspect-ratio: 1;
+  padding: 3.5%;
+  background: var(--tarmac-edge);
+  border-radius: 14px;
+  box-shadow: 0 10px 28px -12px var(--shadow);
+  touch-action: none;
+  user-select: none;
+}
+.grid {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+  background-color: var(--tarmac);
+  background-image:
+    linear-gradient(var(--cell-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--cell-line) 1px, transparent 1px);
+  background-size: calc(100% / 6) calc(100% / 6);
+}
+.exit {
+  position: absolute;
+  right: 0;
+  top: calc(3.5% + (100% - 7%) * 2 / 6);
+  height: calc((100% - 7%) / 6);
+  width: 3.5%;
+  background: var(--tarmac);
+  display: grid;
+  place-items: center;
+}
+.exit::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 8%; bottom: 8%;
+  width: 3px;
+  background: repeating-linear-gradient(var(--marking) 0 6px, transparent 6px 10px);
+}
+.exit span {
+  position: absolute;
+  left: calc(100% + 6px);
+  writing-mode: vertical-rl;
+  font: 700 10px/1 var(--mono);
+  letter-spacing: 0.18em;
+  color: var(--muted);
+}
+
+/* Vehicles */
+.vehicle {
+  position: absolute;
+  padding: 1.1%;
+  cursor: grab;
+  transition: left 140ms ease-out, top 140ms ease-out;
+  touch-action: none;
+}
+.vehicle.dragging { transition: none; cursor: grabbing; z-index: 2; }
+.vehicle:focus-visible { outline: none; }
+.vehicle:focus-visible .body { outline: 3px solid var(--focus); outline-offset: 2px; }
+.body {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  background: var(--c);
+  box-shadow:
+    inset 0 -4px 0 rgba(0, 0, 0, 0.22),
+    inset 0 2px 0 rgba(255, 255, 255, 0.22),
+    0 3px 6px rgba(0, 0, 0, 0.35);
+}
+/* Windscreen and roof: a darker band across the vehicle. */
+.body::before {
+  content: '';
+  position: absolute;
+  background: rgba(20, 26, 34, 0.42);
+  border-radius: 4px;
+}
+.h .body::before { top: 16%; bottom: 16%; right: 20%; width: 13%; }
+.v .body::before { left: 16%; right: 16%; bottom: 20%; height: 13%; }
+.truck .body::after {
+  content: '';
+  position: absolute;
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 3px;
+}
+.h.truck .body::after { top: 22%; bottom: 22%; left: 8%; width: 52%; }
+.v.truck .body::after { left: 22%; right: 22%; top: 8%; height: 52%; }
+.vehicle.red .body { background: var(--red); }
+
+.vehicle.hint .body { animation: pulse 900ms ease-in-out infinite; }
+.ghost {
+  position: absolute;
+  padding: 1.1%;
+  pointer-events: none;
+}
+.ghost::before {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 2px dashed var(--marking);
+  border-radius: 10px;
+}
+@keyframes pulse {
+  50% { box-shadow: 0 0 0 4px var(--marking), 0 3px 6px rgba(0, 0, 0, 0.35); }
+}
+.vehicle.leaving { transition: left 520ms cubic-bezier(0.5, 0, 0.9, 0.4), opacity 520ms ease-in; opacity: 0; }
+
+/* Win panel */
+.win {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 8px;
+  padding: 24px;
+  text-align: center;
+  background: color-mix(in srgb, var(--panel) 92%, transparent);
+  border-radius: 14px;
+}
+.win-title {
+  margin: 0;
+  font-weight: 900;
+  font-size: 44px;
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--red);
+}
+.win-body { margin: 0 0 8px; max-width: 28ch; color: var(--ink); }
+
+/* Stats */
+.stats {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-block: 1px solid var(--rule);
+}
+.stats div { padding: 10px 0; display: grid; gap: 2px; justify-items: center; }
+.stats div + div { border-left: 1px solid var(--rule); }
+.stats dt {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.stats dd {
+  margin: 0;
+  font: 700 24px/1.1 var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+.stats dd.under { color: var(--good); }
+
+/* Controls */
+.controls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.btn {
+  appearance: none;
+  border: 1.5px solid var(--rule);
+  background: var(--panel);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.btn:hover:not(:disabled) { border-color: var(--muted); }
+.btn:disabled { opacity: 0.45; cursor: default; }
+.btn-primary { background: var(--red); border-color: var(--red); color: #fff; padding-inline: 20px; }
+.btn-primary:hover:not(:disabled) { border-color: var(--ink); }
+.help { margin: 0; color: var(--muted); font-size: 14px; min-height: 1.5em; }
+
+/* Card list */
+.cards h2 {
+  margin: 0 0 12px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.card-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(62px, 1fr));
+  gap: 8px;
+}
+.card-btn {
+  width: 100%;
+  display: grid;
+  gap: 0;
+  justify-items: center;
+  padding: 8px 4px 6px;
+  border: 1.5px solid var(--rule);
+  border-radius: 8px;
+  background: var(--panel);
+  cursor: pointer;
+  border-top: 5px solid var(--tier-c);
+}
+.card-btn .n { font: 700 17px/1.1 var(--mono); }
+.card-btn .p { font-size: 11px; color: var(--muted); }
+.card-btn[aria-current="true"] { border-color: var(--ink); border-top-color: var(--tier-c); }
+.card-btn.done .p { color: var(--good); font-weight: 700; }
+.t1 { --tier-c: #2e9f78; }
+.t2 { --tier-c: #e3a52a; }
+.t3 { --tier-c: #3b7bd6; }
+.t4 { --tier-c: #d6312a; }
+
+@media (prefers-reduced-motion: reduce) {
+  .vehicle, .vehicle.leaving { transition: none; }
+  .vehicle.hint .body { animation: none; box-shadow: 0 0 0 4px var(--marking); }
+}

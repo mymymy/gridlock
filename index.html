@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rush Hour</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Overpass:wght@400;600;800;900&family=Overpass+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="app">
+  <header class="top">
+    <h1 class="brand">Rush Hour</h1>
+    <p class="card-label"><span id="card-name">Card 1</span> · <span id="tier" class="tier">Beginner</span></p>
+  </header>
+
+  <section class="play">
+    <div class="board-wrap">
+      <div class="board" id="board" aria-label="Parking grid, 6 by 6">
+        <div class="grid" id="grid"></div>
+        <div class="exit" aria-hidden="true"><span>EXIT</span></div>
+      </div>
+      <div class="win" id="win" hidden>
+        <p class="win-title">Out!</p>
+        <p class="win-body" id="win-body"></p>
+        <button type="button" id="win-next" class="btn btn-primary">Next card</button>
+      </div>
+    </div>
+
+    <dl class="stats">
+      <div><dt>Moves</dt><dd id="moves">0</dd></div>
+      <div><dt>Par</dt><dd id="par">0</dd></div>
+      <div><dt>Best</dt><dd id="best">–</dd></div>
+    </dl>
+
+    <div class="controls">
+      <button type="button" id="undo" class="btn">Undo</button>
+      <button type="button" id="reset" class="btn">Reset</button>
+      <button type="button" id="hint" class="btn">Hint</button>
+    </div>
+    <p class="help" id="help">Drag a vehicle along its lane. Get the red car to the exit.</p>
+  </section>
+
+  <section class="cards" aria-labelledby="cards-title">
+    <h2 id="cards-title">Challenge cards</h2>
+    <ol class="card-list" id="card-list"></ol>
+  </section>
+</main>
+<script src="js/solver.js"></script>
+<script src="js/levels.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>
