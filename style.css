@@ -123,12 +123,29 @@ button { font: inherit; color: inherit; }
   text-transform: uppercase;
   font-style: italic;
 }
+/* Squashed echoes of the title above and below it, after DJR's Roadway poster. */
+.brand-stack {
+  position: relative;
+  display: inline-block;
+  margin-block: 1.45em 1.55em;
+}
+.brand-word { position: relative; }
+.echoes { position: absolute; inset: 0; pointer-events: none; }
+.echo {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  color: var(--marking);
+  transform-origin: 50% 0;
+  transform: translateY(calc(var(--y) * 1em)) scaleY(var(--s));
+}
 .brand::after {
   content: '';
   display: block;
   width: 56px;
   height: 6px;
-  margin: 8px auto 0;
+  margin: 0 auto;
   background: repeating-linear-gradient(90deg, var(--marking) 0 14px, transparent 14px 22px);
 }
 .card-label { margin: 6px 0 0; color: var(--muted); font-weight: 600; }
