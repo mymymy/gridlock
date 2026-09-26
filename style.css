@@ -123,19 +123,17 @@ button { font: inherit; color: inherit; }
   text-transform: uppercase;
   font-style: italic;
 }
-/* Each letter of the title gets a solid extrusion down and to the left in
-   its own colour, for a retro 3D look. */
-.brand-word > span {
-  text-shadow:
-    -0.0125em 0.0125em 0 var(--c),
-    -0.0250em 0.0250em 0 var(--c),
-    -0.0375em 0.0375em 0 var(--c),
-    -0.0500em 0.0500em 0 var(--c),
-    -0.0625em 0.0625em 0 var(--c),
-    -0.0750em 0.0750em 0 var(--c),
-    -0.0875em 0.0875em 0 var(--c),
-    -0.1000em 0.1000em 0 var(--c);
+/* One offset copy of the title behind it, down and to the left, with each
+   letter in a different colour. The title always paints on top. */
+.brand-stack { position: relative; display: inline-block; isolation: isolate; }
+.brand-echo {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  transform: translate(-0.15em, 0.15em);
 }
+.brand-echo > span { color: var(--c); }
+.brand-word { position: relative; }
 .sr-only {
   position: absolute;
   width: 1px;
