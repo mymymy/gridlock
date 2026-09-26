@@ -238,6 +238,12 @@ button { font: inherit; color: inherit; }
   color: #fff;
 }
 .wipe.t2 .wipe-number { color: #1d2126; }
+.wipe-digits {
+  font-family: var(--display);
+  font-style: italic;
+  font-weight: 400;
+  font-stretch: normal;
+}
 .wipe-label {
   font-size: 0.2em;
   letter-spacing: 0.14em;
