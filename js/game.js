@@ -272,6 +272,41 @@
   }
 
   // ---- Winning ----
+  // Result messages. {n} is the player's moves, {s} the shortest route.
+  // Each body is two lines: what happened, then an aside.
+  const PRAISE = {
+    shortest: {
+      titles: ['Flawless!', 'Textbook!', 'Perfect!', 'Show-off!', 'Spotless!'],
+      bodies: [
+        ['Out in {n} moves, the fewest possible.', 'Not a single wasted wiggle.'],
+        ['{n} moves. That’s the shortest route there is.', 'Frankly, it’s a bit much.'],
+        ['You did it in {n}, dead on the minimum.', 'The traffic warden is weeping with joy.'],
+        ['{n} moves, and not one more.', 'Are you sure you’re not a satnav?'],
+        ['Shortest possible route: {n} moves.', 'Yours: also {n}. Nicely done.'],
+      ],
+    },
+    longer: {
+      titles: ['Well done!', 'Road clear!', 'Beep beep!', 'You’re out!', 'Freedom!', 'Nailed it!'],
+      bodies: [
+        ['You got out in {n} moves.', 'There’s a {s}-move shortcut, if you fancy another go.'],
+        ['Free at last, in {n} moves.', 'The scenic route, mind: it can be done in {s}.'],
+        ['Escaped in {n} moves.', 'A tidier driver could do it in {s}. Just saying.'],
+        ['You made it in {n} moves.', 'The shortest route takes {s}, but who’s counting? (We are.)'],
+        ['{n} moves and the red car is away.', 'Rumour has it {s} would do.'],
+        ['Out in {n}. The queue behind you is grateful.', 'The shortest route takes {s}.'],
+      ],
+    },
+  };
+  const lastPick = {};
+
+  // Random item, never the same as last time for this list.
+  function pick(list, name) {
+    let i = Math.floor(Math.random() * list.length);
+    if (list.length > 1 && i === lastPick[name]) i = (i + 1) % list.length;
+    lastPick[name] = i;
+    return list[i];
+  }
+
   function win() {
     solved = true;
     const moves = history.length;
@@ -285,11 +320,13 @@
     red.classList.add('leaving');
     red.style.left = RH.SIZE * UNIT + 4 + '%';
 
-    let text =
-      moves === shortest
-        ? `You solved it in ${moves} moves.\nThat’s the shortest possible route.`
-        : `You solved it in ${moves} moves.\nThe shortest route takes ${shortest}.`;
-    if (hintsUsed) text += `\nYou used ${hintsUsed} hint${hintsUsed === 1 ? '' : 's'}, so this won’t count as your best.`;
+    const kind = moves === shortest ? 'shortest' : 'longer';
+    const fill = (line) => line.replace(/\{n\}/g, moves).replace(/\{s\}/g, shortest);
+    let text = pick(PRAISE[kind].bodies, kind + '-body').map(fill).join('\n');
+    if (hintsUsed) {
+      text += `\nYou had ${hintsUsed === 1 ? 'a little nudge' : 'a few nudges'} from the hints, so this one doesn’t go on your record.`;
+    }
+    $('win-title').textContent = pick(PRAISE[kind].titles, kind + '-title');
     $('win-body').textContent = text;
     const last = level === LEVELS.length - 1;
     $('win-next').textContent = last ? 'Back to level 1' : 'Next level';

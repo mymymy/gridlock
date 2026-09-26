@@ -258,10 +258,11 @@ button { font: inherit; color: inherit; }
   border-radius: 14px;
 }
 .win-title {
+  text-wrap: balance;
   margin: 0;
   font-family: var(--display);
   font-weight: 400;
-  font-size: 40px;
+  font-size: clamp(28px, 9.5vw, 40px);
   line-height: 1;
   text-transform: uppercase;
   color: var(--marking-ink);
