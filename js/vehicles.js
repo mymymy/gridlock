@@ -3,9 +3,10 @@
 // the vehicle's own colour. Drawn facing right; vertical vehicles are
 // rotated to face down.
 //
-// The cabin roof is the tallest part, so it is drawn shifted by (ox, oy)
-// to match the camera's view, and the windows stretch between the roof
-// and the body. game.js works out the shift from the vehicle's position.
+// The cabin roof and the lorry's container stand above the body, so their
+// tops are drawn shifted by (ox, oy) to match the camera's view, with
+// windows or walls stretching down to the body. game.js works out the
+// shift from the vehicle's position.
 (function () {
   'use strict';
 
@@ -58,33 +59,53 @@
     `<rect x="193" y="34" width="3" height="32" rx="1.5" ${dark(0.28)}/>`,
   ].join('');
 
-  // 300 x 100 units, cab at the right.
-  function truck(ox, oy) {
+  // Container from the deck outline b up to its top face r, shifted by (ox, oy),
+  // with moulded ribs across the top and down both long sides.
+  function container(b, r, ox, oy) {
+    // The top may reach the deck edge but never past it.
+    ox = Math.max(b.x1 - r.x1, Math.min(b.x2 - r.x2, ox));
+    oy = Math.max(b.y1 - r.y1, Math.min(b.y2 - r.y2, oy));
+    const B = [pt(b.x1, b.y1), pt(b.x2, b.y1), pt(b.x2, b.y2), pt(b.x1, b.y2)];
+    const x1 = r.x1 + ox, x2 = r.x2 + ox, y1 = r.y1 + oy, y2 = r.y2 + oy;
+    const R = [pt(x1, y1), pt(x2, y1), pt(x2, y2), pt(x1, y2)];
     const parts = [
-      // Cargo box with moulded ribs
-      `<rect x="6" y="6" width="196" height="88" rx="6" ${light(0.1)} stroke="#000" stroke-opacity="0.2" stroke-width="2"/>`,
-      `<rect x="8" y="8" width="5" height="14" rx="2" ${dark(0.34)}/>`,
-      `<rect x="8" y="78" width="5" height="14" rx="2" ${dark(0.34)}/>`,
+      `<polygon points="${B[0]} ${R[0]} ${R[3]} ${B[3]}" ${dark(0.34)}/>`,
+      `<polygon points="${B[0]} ${B[1]} ${R[1]} ${R[0]}" ${dark(0.22)}/>`,
+      `<polygon points="${B[3]} ${B[2]} ${R[2]} ${R[3]}" ${dark(0.22)}/>`,
+      `<polygon points="${R[1]} ${B[1]} ${B[2]} ${R[2]}" ${dark(0.3)}/>`,
+      `<rect x="${+x1.toFixed(1)}" y="${+y1.toFixed(1)}" width="${r.x2 - r.x1}" height="${r.y2 - r.y1}" rx="${r.rx}" ${light(0.14)} stroke="#000" stroke-opacity="0.18" stroke-width="2"/>`,
     ];
-    for (let x = 30; x <= 180; x += 25) {
-      parts.push(line(x, 12, x, 88, 0.16, 3), glint(x + 3, 12, x + 3, 88));
+    // A rib at fraction t along the container meets the deck at the matching
+    // point, so it runs down the side walls at the same slant as the ends.
+    for (let t = 0.14; t < 0.9; t += 0.145) {
+      const tx = x1 + (x2 - x1) * t, bx = b.x1 + (b.x2 - b.x1) * t;
+      parts.push(
+        line(tx, y1 + 4, tx, y2 - 4, 0.16, 3), glint(tx + 3, y1 + 4, tx + 3, y2 - 4),
+        line(tx, y1, bx, b.y1, 0.14, 2), line(tx, y2, bx, b.y2, 0.14, 2)
+      );
     }
-    parts.push(
-      // Gap between box and cab
-      `<rect x="204" y="10" width="6" height="80" rx="2" ${dark(0.38)}/>`,
-      // Cab: back wall, side windows, windscreen and roof
-      cabin({ x1: 212, x2: 264, y1: 8, y2: 92 }, { x1: 222, x2: 244, y1: 26, y2: 74, rx: 7 }, ox, oy, 0.3),
-      `<ellipse cx="244" cy="4" rx="6" ry="3" ${dark(0.3)}/>`,
-      `<ellipse cx="244" cy="96" rx="6" ry="3" ${dark(0.3)}/>`,
-      // Bonnet, headlights, grille
-      line(264, 28, 286, 33, 0.18),
-      line(264, 72, 286, 67, 0.18),
-      `<rect x="282" y="10" width="11" height="15" rx="4" ${light(0.28)}/>`,
-      `<rect x="282" y="75" width="11" height="15" rx="4" ${light(0.28)}/>`,
-      `<rect x="294" y="30" width="3" height="40" rx="1.5" ${dark(0.3)}/>`
-    );
     return parts.join('');
   }
+
+  // 300 x 100 units, cab at the right.
+  const truck = (ox, oy) => [
+    // Tail lights on the deck, then the raised container
+    `<rect x="8" y="8" width="5" height="14" rx="2" ${dark(0.34)}/>`,
+    `<rect x="8" y="78" width="5" height="14" rx="2" ${dark(0.34)}/>`,
+    container({ x1: 6, x2: 202, y1: 6, y2: 94 }, { x1: 18, x2: 192, y1: 17, y2: 83, rx: 5 }, ox, oy),
+    // Gap between container and cab
+    `<rect x="204" y="10" width="6" height="80" rx="2" ${dark(0.38)}/>`,
+    // Cab: back wall, side windows, windscreen and roof
+    cabin({ x1: 212, x2: 264, y1: 8, y2: 92 }, { x1: 222, x2: 244, y1: 26, y2: 74, rx: 7 }, ox, oy, 0.3),
+    `<ellipse cx="244" cy="4" rx="6" ry="3" ${dark(0.3)}/>`,
+    `<ellipse cx="244" cy="96" rx="6" ry="3" ${dark(0.3)}/>`,
+    // Bonnet, headlights, grille
+    line(264, 28, 286, 33, 0.18),
+    line(264, 72, 286, 67, 0.18),
+    `<rect x="282" y="10" width="11" height="15" rx="4" ${light(0.28)}/>`,
+    `<rect x="282" y="75" width="11" height="15" rx="4" ${light(0.28)}/>`,
+    `<rect x="294" y="30" width="3" height="40" rx="1.5" ${dark(0.3)}/>`,
+  ].join('');
 
   // ox, oy: roof shift in the vehicle's own units (100 = one cell), facing right.
   window.vehicleArt = function (v, ox, oy) {
