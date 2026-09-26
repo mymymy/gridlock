@@ -75,7 +75,7 @@
       el.setAttribute('role', 'button');
       el.setAttribute('aria-label', vehicleLabel(i));
       if (i > 0) el.style.setProperty('--c', `var(--v${((i - 1) % 12) + 1})`);
-      el.innerHTML = '<div class="body"></div>';
+      el.innerHTML = `<div class="body">${window.vehicleArt(v)}</div>`;
       el.addEventListener('pointerdown', (e) => onPointerDown(e, i));
       el.addEventListener('keydown', (e) => onKey(e, i));
       gridEl.appendChild(el);
@@ -109,28 +109,26 @@
 
   // Fake 3D, as seen by a camera above the middle of the board: the roof
   // shifts away from the centre and stacked shadows fill in the side walls
-  // down to the vehicle's footprint. Vehicles being dragged sit higher.
+  // down to the vehicle's footprint.
   const LAYERS = 6;
   function shade(i, p, body) {
     const v = vehicles[i];
     const half = RH.SIZE / 2;
     const cx = v.horiz ? p + v.len / 2 : v.fixed + 0.5;
     const cy = v.horiz ? v.fixed + 0.5 : p + v.len / 2;
-    const lifted = drag && drag.i === i;
-    const height = (gridEl.clientWidth / RH.SIZE) * (lifted ? 0.18 : 0.1);
+    const height = (gridEl.clientWidth / RH.SIZE) * 0.1;
     const dx = ((cx - half) / half) * height;
     const dy = ((cy - half) / half) * height;
     const walls = [];
     for (let k = 1; k <= LAYERS; k++) {
       walls.push(`${(-dx * k) / LAYERS}px ${(-dy * k) / LAYERS}px 0 var(--side)`);
     }
-    const blur = lifted ? 14 : 6;
     body.style.transform = `translate(${dx}px, ${dy}px)`;
     body.style.boxShadow = [
       'inset 0 -3px 0 rgba(0, 0, 0, 0.18)',
       'inset 0 2px 0 rgba(255, 255, 255, 0.3)',
       ...walls,
-      `${-dx + 2}px ${-dy + (lifted ? 10 : 4)}px ${blur}px rgba(0, 0, 0, ${lifted ? 0.4 : 0.5})`,
+      `${-dx + 2}px ${-dy + 4}px 6px rgba(0, 0, 0, 0.5)`,
     ].join(', ');
   }
 
@@ -190,7 +188,6 @@
       at: pos[i],
     };
     el.classList.add('dragging');
-    place(i, pos[i]);
     el.addEventListener('pointermove', onPointerMove);
     el.addEventListener('pointerup', onPointerUp);
     el.addEventListener('pointercancel', onPointerUp);
