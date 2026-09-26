@@ -1,4 +1,4 @@
-// Rush Hour game: rendering, dragging, move counting, hints and progress.
+// Grid Lock game: rendering, dragging, move counting, hints and progress.
 (function () {
   'use strict';
 

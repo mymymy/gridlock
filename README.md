@@ -1,6 +1,6 @@
-# Rush Hour
+# Grid Lock
 
-A browser prototype of the Rush Hour sliding-block puzzle. Slide cars and trucks along their lanes until the red car can drive out of the exit on the right.
+A browser sliding-block puzzle in the style of Rush Hour. Slide cars and trucks along their lanes until the red car can drive out of the exit on the right.
 
 ## Play
 

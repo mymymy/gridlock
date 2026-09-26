@@ -72,7 +72,7 @@ button { font: inherit; color: inherit; }
 }
 
 /* Header */
-.top { display: grid; gap: 2px; }
+.top { display: grid; gap: 2px; text-align: center; }
 .brand {
   margin: 0;
   font-weight: 900;
@@ -80,13 +80,14 @@ button { font: inherit; color: inherit; }
   line-height: 1;
   letter-spacing: -0.01em;
   text-transform: uppercase;
+  font-style: italic;
 }
 .brand::after {
   content: '';
   display: block;
   width: 56px;
   height: 6px;
-  margin-top: 8px;
+  margin: 8px auto 0;
   background: repeating-linear-gradient(90deg, var(--marking) 0 14px, transparent 14px 22px);
 }
 .card-label { margin: 6px 0 0; color: var(--muted); font-weight: 600; }
