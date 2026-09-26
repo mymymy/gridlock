@@ -223,7 +223,7 @@ button { font: inherit; color: inherit; }
   inset: 0;
   z-index: 100;
   pointer-events: none;
-  transform: translateX(-100%);
+  transform: translateY(100%);
 }
 #board:focus { outline: none; }
 .sr-only {

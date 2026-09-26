@@ -418,9 +418,9 @@
 
   const STAR = '<svg class="star" viewBox="0 0 100 100" aria-hidden="true"><polygon points="50.0,5.0 62.3,36.0 95.7,38.2 70.0,59.5 78.2,91.8 50.0,74.0 21.8,91.8 30.0,59.5 4.3,38.2 37.7,36.0" stroke-linejoin="round"/></svg>';
 
-  // Choosing a level from the list: a panel in the level's colour wipes
-  // across the screen, the level loads and the page returns to the board
-  // while it's covered, then the panel carries on off the other side.
+  // Choosing a level from the list: a panel in the level's colour wipes up
+  // the screen (the way the page scrolls back), the level loads and the page returns to the board
+  // while it's covered, then the panel carries on off the top.
   let wiping = false;
   function goToLevel(n) {
     if (wiping) return;
@@ -439,10 +439,10 @@
     wipe.style.background = `var(--${tier(LEVELS[n].minMoves).cls.replace('t', 'tier')})`;
     document.body.appendChild(wipe);
     const ease = { duration: 260, easing: 'cubic-bezier(0.65, 0, 0.35, 1)', fill: 'forwards' };
-    wipe.animate([{ transform: 'translateX(-100%)' }, { transform: 'translateX(0)' }], ease).finished
+    wipe.animate([{ transform: 'translateY(100%)' }, { transform: 'translateY(0)' }], ease).finished
       .then(() => {
         arrive();
-        return wipe.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(100%)' }], { ...ease, duration: 300 }).finished;
+        return wipe.animate([{ transform: 'translateY(0)' }, { transform: 'translateY(-100%)' }], { ...ease, duration: 300 }).finished;
       })
       .finally(() => {
         wipe.remove();
