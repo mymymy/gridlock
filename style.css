@@ -58,7 +58,6 @@
 
   --display: 'Megazoid', 'Strichpunkt Sans', 'Helvetica Neue', Arial, sans-serif;
   --font: 'Strichpunkt Sans', 'Helvetica Neue', Arial, sans-serif;
-  --mono: 'Overpass Mono', ui-monospace, Menlo, Consolas, monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -182,7 +181,7 @@ button { font: inherit; color: inherit; }
   position: absolute;
   left: calc(100% + 6px);
   writing-mode: vertical-rl;
-  font: 700 10px/1 var(--mono);
+  font: 700 10px/1 var(--font);
   letter-spacing: 0.18em;
   color: var(--muted);
 }
@@ -287,7 +286,7 @@ button { font: inherit; color: inherit; }
 }
 .stats dd {
   margin: 0;
-  font: 700 24px/1.1 var(--mono);
+  font: 400 28px/1.1 var(--display);
   font-variant-numeric: tabular-nums;
 }
 .stats dd.under { color: var(--good); }
@@ -336,12 +335,6 @@ button { font: inherit; color: inherit; }
   font-size: 15px;
   font-weight: 800;
 }
-.card-group h3 span:first-child {
-  font-family: var(--display);
-  font-weight: 400;
-  font-size: 17px;
-  letter-spacing: 0.02em;
-}
 .card-group .count {
   font-size: 12px;
   font-weight: 600;
@@ -360,7 +353,7 @@ button { font: inherit; color: inherit; }
   cursor: pointer;
   border-top: 5px solid var(--tier-c);
 }
-.card-btn .n { font: 700 17px/1.1 var(--mono); }
+.card-btn .n { font: 400 19px/1.1 var(--display); }
 .card-btn .p { font-size: 11px; color: var(--muted); }
 .card-btn[aria-current="true"] { border-color: var(--ink); border-top-color: var(--tier-c); }
 .card-btn.done .p { color: var(--good); font-weight: 700; }
