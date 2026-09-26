@@ -418,10 +418,11 @@
 
   const STAR = '<svg class="star" viewBox="0 0 100 100" aria-hidden="true"><polygon points="50.0,5.0 62.3,36.0 95.7,38.2 70.0,59.5 78.2,91.8 50.0,74.0 21.8,91.8 30.0,59.5 4.3,38.2 37.7,36.0" stroke-linejoin="round"/></svg>';
 
-  // Choosing a level from the list: a panel in the level's colour wipes up
-  // the screen (the way the page scrolls back). While it covers the page the
-  // level loads and the page returns to the board; then it lifts off the top
-  // with echoes in the other four level colours trailing behind it.
+  // Moving to a new level (from the list or the result panel): a panel in the
+  // level's colour wipes up the screen (the way the page scrolls back). While
+  // it covers the page the level loads and the page returns to the board;
+  // then it lifts off the top with echoes in the other four level colours
+  // trailing behind it.
   let wiping = false;
   function goToLevel(n) {
     if (wiping) return;
@@ -510,7 +511,7 @@
   $('undo').addEventListener('click', undo);
   $('reset').addEventListener('click', reset);
   $('hint').addEventListener('click', showHint);
-  $('win-next').addEventListener('click', () => startLevel(level === LEVELS.length - 1 ? 0 : level + 1));
+  $('win-next').addEventListener('click', () => goToLevel(level === LEVELS.length - 1 ? 0 : level + 1));
   document.addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
       e.preventDefault();
