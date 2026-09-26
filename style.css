@@ -310,7 +310,7 @@ button { font: inherit; color: inherit; }
   font-style: italic;
   color: var(--marking-ink);
 }
-.win-body { margin: 0 0 8px; max-width: 30ch; color: var(--ink); white-space: pre-line; }
+.win-body { margin: 0 0 8px; max-width: 34ch; color: var(--ink); white-space: pre-line; text-wrap: balance; }
 
 /* Stats */
 .stats {

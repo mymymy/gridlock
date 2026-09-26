@@ -274,13 +274,13 @@
   // ---- Winning ----
   // Result messages. {n} is the player's moves, {s} the shortest route,
   // {d} how many more moves the player took than needed.
-  // Each body is two lines: what happened, then an aside.
+  // Each body is what happened, then an aside; \n marks a hand-set line break.
   const PRAISE = {
     shortest: {
       titles: ['Flawless', 'Textbook', 'Perfect', 'Show-off', 'Spotless'],
       bodies: [
         ['Out in {n} moves, the fewest possible.', 'Not a single wasted wiggle.'],
-        ['{n} moves. That’s the shortest route there is.', 'Frankly, it’s a bit much.'],
+        ['{n} moves.', 'That’s the shortest route there is.\nFrankly, it’s a bit much.'],
         ['You did it in {n}, dead on the minimum.', 'The traffic warden is weeping with joy.'],
         ['{n} moves, and not one more.', 'Are you sure you’re not a satnav?'],
         ['Shortest possible route: {n} moves.', 'Yours: also {n}. Nicely done.'],
@@ -289,13 +289,13 @@
     longer: {
       titles: ['Well done', 'Road clear', 'Beep beep', 'You’re out', 'Freedom', 'Nailed it'],
       bodies: [
-        ['You got out in {n} moves.', 'It can be done in just {s}, if you fancy another go.'],
-        ['Free at last, in {n} moves.', 'The scenic route, mind: it can be done in {s}.'],
-        ['Escaped in {n} moves.', 'A tidier driver could do it in {s}. Just saying.'],
-        ['You made it in {n} moves.', 'The shortest route takes {s}, but who’s counting? (We are.)'],
+        ['You got out in {n} moves.', 'It can be done in just {s},\nif you fancy another go.'],
+        ['Free at last, in {n} moves.', 'The scenic route, mind:\nit can be done in {s}.'],
+        ['Escaped in {n} moves.', 'A tidier driver could do it in {s}.\nJust saying.'],
+        ['You made it in {n} moves.', 'The shortest route takes {s},\nbut who’s counting? (We are.)'],
         ['{n} moves and the red car is away.', 'Rumour has it {s} moves would do.'],
-        ['Out in {n}. The queue behind you is grateful.', 'The shortest route takes {s}.'],
-        ['You got out in {n} moves.', 'That’s {d} more than you needed. The red car forgives you.'],
+        ['Out in {n}.', 'The queue behind you is grateful.\nThe shortest route takes {s}.'],
+        ['You got out in {n} moves.', 'That’s {d} more than you needed.\nThe red car forgives you.'],
         ['{n} moves. Free at last.', 'Only {d} more than you needed. Only.'],
       ],
     },
@@ -328,7 +328,7 @@
       line.replace(/\{n\}/g, moves).replace(/\{s\}/g, shortest).replace(/\{d\}/g, moves - shortest);
     let text = pick(PRAISE[kind].bodies, kind + '-body').map(fill).join('\n');
     if (hintsUsed) {
-      text += `\nYou had ${hintsUsed === 1 ? 'a little nudge' : 'a few nudges'} from the hints, so this one doesn’t go on your record.`;
+      text += `\nYou had ${hintsUsed === 1 ? 'a little nudge' : 'a few nudges'} from the hints,\nso this one doesn’t go on your record.`;
     }
     $('win-title').textContent = pick(PRAISE[kind].titles, kind + '-title');
     $('win-body').textContent = text;
