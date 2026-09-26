@@ -440,7 +440,10 @@ button { font: inherit; color: inherit; }
   display: grid;
   gap: 0;
   justify-items: center;
-  padding: 8px 4px 6px;
+  position: relative;
+  min-height: 50px;
+  align-content: center;
+  padding: 6px 4px;
   border: 1.5px solid var(--rule);
   border-radius: 8px;
   background: var(--panel);
@@ -448,11 +451,16 @@ button { font: inherit; color: inherit; }
   border-top: 5px solid var(--tier-c);
 }
 .card-btn .n { font: 700 18px/1.1 var(--font); font-stretch: 125%; }
-.card-btn .p { font-size: 11px; color: var(--muted); }
+.card-btn .star {
+  position: absolute;
+  top: 2px;
+  right: 5px;
+  font-size: 13px;
+  line-height: 1;
+}
 .card-btn[aria-current="true"] { border-color: var(--ink); border-top-color: var(--tier-c); }
 /* Solved levels fill with their difficulty colour. */
 .card-btn.done { background: var(--tier-c); border-color: var(--tier-c); color: #fff; }
-.card-btn.done .p { color: inherit; font-weight: 700; }
 .card-btn.done.t2 { color: #1d2126; }
 .card-btn.done[aria-current="true"] { border-color: var(--ink); }
 .t1 { --tier-c: var(--tier1); }

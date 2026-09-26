@@ -423,10 +423,15 @@
     b.type = 'button';
     b.className = 'card-btn ' + tier(L.minMoves).cls;
     const best = progress.best[L.board];
+    const perfect = best && best <= L.minMoves;
     if (best) b.classList.add('done');
+    if (perfect) b.classList.add('perfect');
     if (n === level) b.setAttribute('aria-current', 'true');
-    b.innerHTML = `<span class="n">${n + 1}</span><span class="p">${best ? '✓ ' + best : '&nbsp;'}</span>`;
-    b.setAttribute('aria-label', `Level ${n + 1}, ${tier(L.minMoves).name}${best ? `, best ${best} moves` : ''}`);
+    // The tile shows only the level number; fill means solved, a star means
+    // solved in the fewest possible moves.
+    b.innerHTML = `<span class="n">${n + 1}</span>${perfect ? '<span class="star" aria-hidden="true">★</span>' : ''}`;
+    const state = perfect ? ', solved in the fewest moves' : best ? ', solved' : '';
+    b.setAttribute('aria-label', `Level ${n + 1}, ${tier(L.minMoves).name}${state}`);
     b.addEventListener('click', () => startLevel(n));
     li.appendChild(b);
     return li;
