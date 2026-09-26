@@ -280,7 +280,6 @@
       titles: ['Flawless', 'Textbook', 'Perfect', 'Show-off', 'Spotless'],
       bodies: [
         ['Out in {n} moves, the fewest possible.', 'Not a single wasted wiggle.'],
-        ['{n} moves.', 'That’s the shortest route there is.\nFrankly, it’s a bit much.'],
         ['You did it in {n}, dead on the minimum.', 'The traffic warden is weeping with joy.'],
         ['{n} moves, and not one more.', 'Are you sure you’re not a satnav?'],
         ['Shortest possible route: {n} moves.', 'Yours: also {n}. Nicely done.'],
