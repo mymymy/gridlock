@@ -40,7 +40,8 @@
     if (par <= 7) return { name: 'Beginner', cls: 't1' };
     if (par <= 14) return { name: 'Intermediate', cls: 't2' };
     if (par <= 21) return { name: 'Advanced', cls: 't3' };
-    return { name: 'Expert', cls: 't4' };
+    if (par <= 34) return { name: 'Expert', cls: 't4' };
+    return { name: 'Grand Master', cls: 't5' };
   }
 
   // ---- Level setup ----

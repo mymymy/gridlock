@@ -6,6 +6,10 @@
 // each position is from a solution. Picking a position at a chosen distance
 // gives a puzzle of known difficulty.
 //
+// Random layouts rarely give puzzles above about 25 moves, so the harder
+// targets come from hill climbing: repeatedly add, remove or move a vehicle,
+// keeping the change whenever the hardest reachable position gets no easier.
+//
 // Usage: node tools/generate.js [seed]
 'use strict';
 
@@ -16,9 +20,12 @@ const RH = require('../js/solver.js');
 const TARGETS = [
   3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
   13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
-  24, 26, 28, 30, 32, 34, 36, 38, 40, 43,
+  24, 26, 28, 30, 32, 34, 36, 38, 40, 42,
+  44,
 ];
-const TIME_BUDGET_MS = 60000;
+const RANDOM_BUDGET_MS = 20000;
+const TIME_BUDGET_MS = 180000;
+const RESTART_AFTER = 400; // hill-climbing steps without improvement
 const MAX_COMPONENT = 50000;
 
 // Small seeded PRNG (mulberry32) so a seed always gives the same levels.
@@ -116,31 +123,108 @@ function relabel(board) {
     .join('');
 }
 
+// Fill the hardest open target this component can reach, if any.
+function harvest(result, vehicles, open, byPar, rand, note) {
+  const target = [...open].filter((t) => t <= result.max).sort((a, b) => b - a)[0];
+  if (target === undefined) return;
+  const matches = [];
+  for (const [k, d] of result.dist) if (d === target) matches.push(k);
+  const k = matches[Math.floor(rand() * matches.length)];
+  byPar.set(target, relabel(RH.stringify(vehicles, result.seen.get(k))));
+  open.delete(target);
+  console.log(`par ${String(target).padStart(2)} found ${note}`);
+}
+
+function evaluate(board) {
+  const { vehicles, pos } = RH.parse(board);
+  const result = distances(vehicles, pos);
+  if (!result) return null;
+  let max = 0;
+  let hardest = null;
+  for (const [k, d] of result.dist) {
+    if (d > max) {
+      max = d;
+      hardest = k;
+    }
+  }
+  result.max = max;
+  result.hardest = RH.stringify(vehicles, result.seen.get(hardest));
+  return { vehicles, result };
+}
+
+const LETTERS = 'BCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+function removeVehicle(board, rand) {
+  const ids = [...new Set(board)].filter((c) => c !== '.' && c !== 'A');
+  if (!ids.length) return board;
+  const id = ids[Math.floor(rand() * ids.length)];
+  return board.split(id).join('.');
+}
+
+function addVehicle(board, rand) {
+  const { SIZE, EXIT_ROW } = RH;
+  const id = [...LETTERS].find((c) => !board.includes(c));
+  if (!id) return board;
+  const grid = [...board];
+  for (let attempt = 0; attempt < 50; attempt++) {
+    const horiz = rand() < 0.5;
+    const len = rand() < 0.75 ? 2 : 3;
+    const r = Math.floor(rand() * (horiz ? SIZE : SIZE - len + 1));
+    const c = Math.floor(rand() * (horiz ? SIZE - len + 1 : SIZE));
+    if (horiz && r === EXIT_ROW) continue;
+    const cells = [];
+    for (let k = 0; k < len; k++) cells.push(horiz ? r * SIZE + c + k : (r + k) * SIZE + c);
+    if (cells.some((i) => grid[i] !== '.')) continue;
+    cells.forEach((i) => (grid[i] = id));
+    return grid.join('');
+  }
+  return board;
+}
+
+function mutate(board, rand) {
+  const roll = rand();
+  if (roll < 0.3) return removeVehicle(board, rand);
+  if (roll < 0.6) return addVehicle(board, rand);
+  return addVehicle(removeVehicle(board, rand), rand);
+}
+
 function main() {
   const seed = Number(process.argv[2] || 2026);
   const rand = rng(seed);
   const started = Date.now();
+  const elapsed = () => Date.now() - started;
   const byPar = new Map(); // par -> board
   const open = new Set(TARGETS);
 
-  // Each random layout fills the hardest target it can still reach, so easy
-  // and hard puzzles come from different layouts.
-  for (let tries = 0; open.size && Date.now() - started < TIME_BUDGET_MS; tries++) {
-    const { vehicles, pos } = RH.parse(randomLayout(rand));
-    const result = distances(vehicles, pos);
-    if (!result) continue;
-    let max = 0;
-    for (const d of result.dist.values()) if (d > max) max = d;
-    const target = [...open].filter((t) => t <= max).sort((a, b) => b - a)[0];
-    if (target === undefined) continue;
-    const matches = [];
-    for (const [k, d] of result.dist) if (d === target) matches.push(k);
-    const k = matches[Math.floor(rand() * matches.length)];
-    byPar.set(target, relabel(RH.stringify(vehicles, result.seen.get(k))));
-    open.delete(target);
-    console.log(`par ${String(target).padStart(2)} found after ${tries} layouts`);
+  // Phase 1: random layouts. Each fills the hardest target it can still
+  // reach, so easy and hard puzzles come from different layouts.
+  for (let tries = 0; open.size && elapsed() < RANDOM_BUDGET_MS; tries++) {
+    const e = evaluate(randomLayout(rand));
+    if (e) harvest(e.result, e.vehicles, open, byPar, rand, `after ${tries} random layouts`);
   }
-  if (open.size) console.warn(`Not found in time: ${[...open].join(', ')}`);
+
+  // Phase 2: hill climbing towards the remaining (harder) targets.
+  let current = null;
+  let stale = 0;
+  let best = 0;
+  for (let steps = 0; open.size && elapsed() < TIME_BUDGET_MS; steps++) {
+    if (!current || stale > RESTART_AFTER) {
+      const e = evaluate(randomLayout(rand));
+      if (!e) continue;
+      current = { board: e.result.hardest, max: e.result.max };
+      stale = 0;
+    }
+    const e = evaluate(mutate(current.board, rand));
+    if (!e || e.result.max < current.max) {
+      stale++;
+      continue;
+    }
+    stale = e.result.max > current.max ? 0 : stale + 1;
+    current = { board: e.result.hardest, max: e.result.max };
+    if (current.max > best) best = current.max;
+    harvest(e.result, e.vehicles, open, byPar, rand, `by hill climbing (${(elapsed() / 1000).toFixed(0)}s)`);
+  }
+  if (open.size) console.warn(`Not found in time: ${[...open].join(', ')} (hardest seen: ${best})`);
 
   const levels = [];
   for (const target of TARGETS) {

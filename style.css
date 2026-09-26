@@ -304,6 +304,7 @@ button { font: inherit; color: inherit; }
 .t2 { --tier-c: #e3a52a; }
 .t3 { --tier-c: #3b7bd6; }
 .t4 { --tier-c: #d6312a; }
+.t5 { --tier-c: #8a68cf; }
 
 @media (prefers-reduced-motion: reduce) {
   .vehicle, .vehicle.leaving { transition: none; }
