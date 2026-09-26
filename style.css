@@ -230,12 +230,19 @@ button { font: inherit; color: inherit; }
   position: absolute;
   inset: 0;
   display: grid;
-  place-items: center;
+  place-content: center;
+  justify-items: center;
+  gap: 0.08em;
   font: 700 min(38vw, 30vh)/1 var(--font);
   font-stretch: 125%;
   color: #fff;
 }
 .wipe.t2 .wipe-number { color: #1d2126; }
+.wipe-label {
+  font-size: 0.2em;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
 #board:focus { outline: none; }
 .sr-only {
   position: absolute;

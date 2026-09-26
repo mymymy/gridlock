@@ -457,7 +457,7 @@
     // so it stays still on screen while the panel reveals and hides it.
     const number = document.createElement('div');
     number.className = 'wipe-number';
-    number.textContent = n + 1;
+    number.innerHTML = `<span class="wipe-label">Level</span><span>${n + 1}</span>`;
     mainPanel.appendChild(number);
     const HOLD = 250; // time fully covered, to read the number
     const down = 'translateY(-100%)', under = 'translateY(100%)';
