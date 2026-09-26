@@ -125,46 +125,52 @@ button { font: inherit; color: inherit; }
   text-transform: uppercase;
   font-style: italic;
 }
-/* Title intro: a coloured copy slides out from behind the title while the
-   letters flash through the level colours, then everything settles on the
-   plain title. game.js adds .play on load and when the title is tapped. */
-.brand-stack { position: relative; display: inline-block; isolation: isolate; }
-.brand-echo {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  opacity: 0;
-}
-.brand-echo > span { color: var(--c); }
+/* Title intro, a Mexican wave: each letter rises up and to the right off
+   its resting place, trailing a solid extrusion in its level colour back to
+   the base, then sinks back. Letters further left paint on top, so an
+   extrusion never covers another letter's face. game.js adds .play on load
+   and when the title is tapped. */
+.brand-stack { position: relative; display: inline-block; }
 .brand-word {
   position: relative;
   -webkit-text-stroke: 0.06em var(--ground);
   paint-order: stroke fill;
 }
+.brand-word > span {
+  position: relative;
+  display: inline-block;
+  z-index: calc(10 - var(--i));
+}
 .brand { cursor: default; -webkit-user-select: none; user-select: none; }
-.brand.play .brand-echo { animation: echo-out 2s cubic-bezier(0.3, 0, 0.3, 1) both; }
 .brand.play .brand-word > span {
-  animation: letter-flash 1.6s step-end both;
-  /* Start each letter one colour further on, and settle left to right. */
-  animation-delay: calc((7 - var(--i)) * -144ms);
+  animation: letter-rise 1.1s cubic-bezier(0.45, 0, 0.35, 1) both;
+  animation-delay: calc(150ms + var(--i) * 90ms);
 }
-@keyframes echo-out {
-  0% { opacity: 1; transform: translate(0, 0); }
-  18%, 72% { opacity: 1; transform: translate(-0.15em, 0.15em); }
-  100% { opacity: 0; transform: translate(0, 0); }
-}
-@keyframes letter-flash {
-  0% { color: var(--tier1); }
-  9% { color: var(--tier2); }
-  18% { color: var(--tier3); }
-  27% { color: var(--tier4); }
-  36% { color: var(--tier5); }
-  45% { color: var(--tier1); }
-  54% { color: var(--tier2); }
-  63% { color: var(--tier3); }
-  72% { color: var(--tier4); }
-  81% { color: var(--tier5); }
-  90%, 100% { color: var(--ink); }
+@keyframes letter-rise {
+  0%, 100% {
+    transform: translate(0, 0);
+    text-shadow:
+    0 0 0 transparent,
+    0 0 0 transparent,
+    0 0 0 transparent,
+    0 0 0 transparent,
+    0 0 0 transparent,
+    0 0 0 transparent,
+    0 0 0 transparent,
+    0 0 0 transparent;
+  }
+  45%, 55% {
+    transform: translate(0.12em, -0.12em);
+    text-shadow:
+    -0.0150em 0.0150em 0 var(--c),
+    -0.0300em 0.0300em 0 var(--c),
+    -0.0450em 0.0450em 0 var(--c),
+    -0.0600em 0.0600em 0 var(--c),
+    -0.0750em 0.0750em 0 var(--c),
+    -0.0900em 0.0900em 0 var(--c),
+    -0.1050em 0.1050em 0 var(--c),
+    -0.1200em 0.1200em 0 var(--c);
+  }
 }
 .sr-only {
   position: absolute;
@@ -417,7 +423,7 @@ button { font: inherit; color: inherit; }
 .card-group h3 span:first-child { font-stretch: 125%; }
 
 @media (prefers-reduced-motion: reduce) {
-  .brand.play .brand-echo, .brand.play .brand-word > span { animation: none; }
+  .brand.play .brand-word > span { animation: none; }
   .vehicle, .vehicle.leaving, .body { transition: none; }
   .vehicle.hint .body { animation: none; }
 }
