@@ -1,4 +1,4 @@
-// Grid Lock game: rendering, dragging, move counting, hints and progress.
+// Gridlock game: rendering, dragging, move counting, hints and progress.
 (function () {
   'use strict';
 
