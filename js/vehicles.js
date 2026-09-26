@@ -20,6 +20,9 @@
 
   // Glasshouse from the body-level outline b to the roof r, shifted by (ox, oy).
   function cabin(b, r, ox, oy, rearShade) {
+    // Keep the roof inside the body outline so the windows never fold over.
+    ox = Math.max(b.x1 - r.x1 + 3, Math.min(b.x2 - r.x2 - 3, ox));
+    oy = Math.max(b.y1 - r.y1 + 3, Math.min(b.y2 - r.y2 - 3, oy));
     const B = [pt(b.x1, b.y1), pt(b.x2, b.y1), pt(b.x2, b.y2), pt(b.x1, b.y2)];
     const x1 = r.x1 + ox, x2 = r.x2 + ox, y1 = r.y1 + oy, y2 = r.y2 + oy;
     const R = [pt(x1, y1), pt(x2, y1), pt(x2, y2), pt(x1, y2)];
@@ -43,7 +46,7 @@
     `<rect x="5" y="10" width="8" height="16" rx="3" ${dark(0.32)}/>`,
     `<rect x="5" y="74" width="8" height="16" rx="3" ${dark(0.32)}/>`,
     // Rear window, side windows, windscreen and raised roof
-    cabin({ x1: 40, x2: 140, y1: 12, y2: 88 }, { x1: 58, x2: 116, y1: 21, y2: 79, rx: 9 }, ox, oy, 0.36),
+    cabin({ x1: 40, x2: 140, y1: 12, y2: 88 }, { x1: 62, x2: 112, y1: 27, y2: 73, rx: 9 }, ox, oy, 0.36),
     // Wing mirrors
     `<ellipse cx="130" cy="5" rx="6" ry="3" ${dark(0.3)}/>`,
     `<ellipse cx="130" cy="95" rx="6" ry="3" ${dark(0.3)}/>`,
@@ -70,7 +73,7 @@
       // Gap between box and cab
       `<rect x="204" y="10" width="6" height="80" rx="2" ${dark(0.38)}/>`,
       // Cab: back wall, side windows, windscreen and roof
-      cabin({ x1: 212, x2: 262, y1: 10, y2: 90 }, { x1: 216, x2: 246, y1: 19, y2: 81, rx: 7 }, ox, oy, 0.3),
+      cabin({ x1: 212, x2: 262, y1: 10, y2: 90 }, { x1: 222, x2: 244, y1: 25, y2: 75, rx: 7 }, ox, oy, 0.3),
       `<ellipse cx="244" cy="4" rx="6" ry="3" ${dark(0.3)}/>`,
       `<ellipse cx="244" cy="96" rx="6" ry="3" ${dark(0.3)}/>`,
       // Bonnet, headlights, grille
