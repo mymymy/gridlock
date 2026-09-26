@@ -1,3 +1,33 @@
+/* Megazoid by DJR, licensed for web use (up to 15,000 monthly unique visitors). */
+@font-face {
+  font-family: 'Megazoid';
+  src: url('fonts/Megazoid-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Megazoid Fill';
+  src: url('fonts/Megazoid-Fill.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Megazoid Shade Left';
+  src: url('fonts/Megazoid-ShadeLeft.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Megazoid Shade Right';
+  src: url('fonts/Megazoid-ShadeRight.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Palette: concrete ground, tarmac board, yellow road marking, signal red. */
 :root {
   --ground: #e4e8ec;
@@ -19,6 +49,7 @@
   --v5: #de6a9d; --v6: #33a4b6; --v7: #b48a4c; --v8: #78a03c;
   --v9: #4b5ea8; --v10: #c2582f; --v11: #5d8e8a; --v12: #9c5a9a;
 
+  --display: 'Megazoid', 'Overpass', 'Helvetica Neue', Arial, sans-serif;
   --font: 'Overpass', 'Helvetica Neue', Arial, sans-serif;
   --mono: 'Overpass Mono', ui-monospace, Menlo, Consolas, monospace;
 }
@@ -78,10 +109,11 @@ button { font: inherit; color: inherit; }
 .top { display: grid; gap: 2px; text-align: center; }
 .brand {
   margin: 0;
-  font-weight: 900;
-  font-size: 34px;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 38px;
   line-height: 1;
-  letter-spacing: -0.01em;
+  letter-spacing: 0.01em;
   text-transform: uppercase;
   font-style: italic;
 }
@@ -221,7 +253,8 @@ button { font: inherit; color: inherit; }
 }
 .win-title {
   margin: 0;
-  font-weight: 900;
+  font-family: var(--display);
+  font-weight: 400;
   font-size: 40px;
   line-height: 1;
   text-transform: uppercase;
@@ -295,6 +328,12 @@ button { font: inherit; color: inherit; }
   gap: 12px;
   font-size: 15px;
   font-weight: 800;
+}
+.card-group h3 span:first-child {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 17px;
+  letter-spacing: 0.02em;
 }
 .card-group .count {
   font-size: 12px;
