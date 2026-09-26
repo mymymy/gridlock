@@ -276,7 +276,7 @@
   // Each body is two lines: what happened, then an aside.
   const PRAISE = {
     shortest: {
-      titles: ['Flawless!', 'Textbook!', 'Perfect!', 'Show-off!', 'Spotless!'],
+      titles: ['Flawless', 'Textbook', 'Perfect', 'Show-off', 'Spotless'],
       bodies: [
         ['Out in {n} moves, the fewest possible.', 'Not a single wasted wiggle.'],
         ['{n} moves. That’s the shortest route there is.', 'Frankly, it’s a bit much.'],
@@ -286,7 +286,7 @@
       ],
     },
     longer: {
-      titles: ['Well done!', 'Road clear!', 'Beep beep!', 'You’re out!', 'Freedom!', 'Nailed it!'],
+      titles: ['Well done', 'Road clear', 'Beep beep', 'You’re out', 'Freedom', 'Nailed it'],
       bodies: [
         ['You got out in {n} moves.', 'There’s a {s}-move shortcut, if you fancy another go.'],
         ['Free at last, in {n} moves.', 'The scenic route, mind: it can be done in {s}.'],
