@@ -287,9 +287,9 @@
 
     let text =
       moves === shortest
-        ? `You solved it in ${moves} moves. That’s the shortest possible route.`
-        : `You solved it in ${moves} moves. The shortest route takes ${shortest}.`;
-    if (hintsUsed) text += ` You used ${hintsUsed} hint${hintsUsed === 1 ? '' : 's'}, so this won’t count as your best.`;
+        ? `You solved it in ${moves} moves.\nThat’s the shortest possible route.`
+        : `You solved it in ${moves} moves.\nThe shortest route takes ${shortest}.`;
+    if (hintsUsed) text += `\nYou used ${hintsUsed} hint${hintsUsed === 1 ? '' : 's'}, so this won’t count as your best.`;
     $('win-body').textContent = text;
     const last = level === LEVELS.length - 1;
     $('win-next').textContent = last ? 'Back to card 1' : 'Next card';
