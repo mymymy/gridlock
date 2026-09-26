@@ -272,7 +272,8 @@
   }
 
   // ---- Winning ----
-  // Result messages. {n} is the player's moves, {s} the shortest route.
+  // Result messages. {n} is the player's moves, {s} the shortest route,
+  // {d} how many more moves the player took than needed.
   // Each body is two lines: what happened, then an aside.
   const PRAISE = {
     shortest: {
@@ -294,6 +295,8 @@
         ['You made it in {n} moves.', 'The shortest route takes {s}, but who’s counting? (We are.)'],
         ['{n} moves and the red car is away.', 'Rumour has it {s} moves would do.'],
         ['Out in {n}. The queue behind you is grateful.', 'The shortest route takes {s}.'],
+        ['You got out in {n} moves.', 'That’s {d} more than you needed. The red car forgives you.'],
+        ['{n} moves. Free at last.', 'Only {d} more than you needed. Only.'],
       ],
     },
   };
@@ -321,7 +324,8 @@
     red.style.left = RH.SIZE * UNIT + 4 + '%';
 
     const kind = moves === shortest ? 'shortest' : 'longer';
-    const fill = (line) => line.replace(/\{n\}/g, moves).replace(/\{s\}/g, shortest);
+    const fill = (line) =>
+      line.replace(/\{n\}/g, moves).replace(/\{s\}/g, shortest).replace(/\{d\}/g, moves - shortest);
     let text = pick(PRAISE[kind].bodies, kind + '-body').map(fill).join('\n');
     if (hintsUsed) {
       text += `\nYou had ${hintsUsed === 1 ? 'a little nudge' : 'a few nudges'} from the hints, so this one doesn’t go on your record.`;
