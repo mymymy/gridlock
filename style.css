@@ -46,6 +46,8 @@
   --tarmac-edge: #262a30;
   --cell-line: rgba(255, 255, 255, 0.11);
   --marking: #f0c02e;
+  /* Difficulty colours: Beginner to Grand Master. */
+  --tier1: #2e9f78; --tier2: #e3a52a; --tier3: #3b7bd6; --tier4: #d6312a; --tier5: #8a68cf;
   --marking-ink: #8f6500; /* yellow dark enough to read as text on light grounds */
   --red: #d6312a;
   --focus: #1f6fd1;
@@ -141,14 +143,6 @@ button { font: inherit; color: inherit; }
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
-}
-.brand::after {
-  content: '';
-  display: block;
-  width: 56px;
-  height: 6px;
-  margin: 8px auto 0;
-  background: repeating-linear-gradient(90deg, var(--marking) 0 14px, transparent 14px 22px);
 }
 .card-label { margin: 6px 0 0; color: var(--muted); font-weight: 600; }
 .tier { color: var(--ink); }
@@ -378,11 +372,11 @@ button { font: inherit; color: inherit; }
 .card-btn .p { font-size: 11px; color: var(--muted); }
 .card-btn[aria-current="true"] { border-color: var(--ink); border-top-color: var(--tier-c); }
 .card-btn.done .p { color: var(--good); font-weight: 700; }
-.t1 { --tier-c: #2e9f78; }
-.t2 { --tier-c: #e3a52a; }
-.t3 { --tier-c: #3b7bd6; }
-.t4 { --tier-c: #d6312a; }
-.t5 { --tier-c: #8a68cf; }
+.t1 { --tier-c: var(--tier1); }
+.t2 { --tier-c: var(--tier2); }
+.t3 { --tier-c: var(--tier3); }
+.t4 { --tier-c: var(--tier4); }
+.t5 { --tier-c: var(--tier5); }
 
 /* Wide cut of Special Gothic for subheadings and labels; body text stays regular width. */
 .card-label,
