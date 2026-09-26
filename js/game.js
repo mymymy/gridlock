@@ -399,6 +399,16 @@
 
   window.addEventListener('resize', () => els.forEach((el, i) => place(i, pos[i])));
 
+  // Title intro; tap the title to play it again.
+  const brand = document.querySelector('.brand');
+  function playTitle() {
+    brand.classList.remove('play');
+    void brand.offsetWidth; // restart the CSS animations
+    brand.classList.add('play');
+  }
+  brand.addEventListener('click', playTitle);
+  playTitle();
+
   $('undo').addEventListener('click', undo);
   $('reset').addEventListener('click', reset);
   $('hint').addEventListener('click', showHint);

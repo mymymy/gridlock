@@ -125,17 +125,47 @@ button { font: inherit; color: inherit; }
   text-transform: uppercase;
   font-style: italic;
 }
-/* One offset copy of the title behind it, down and to the left, with each
-   letter in a different colour. The title always paints on top. */
+/* Title intro: a coloured copy slides out from behind the title while the
+   letters flash through the level colours, then everything settles on the
+   plain title. game.js adds .play on load and when the title is tapped. */
 .brand-stack { position: relative; display: inline-block; isolation: isolate; }
 .brand-echo {
   position: absolute;
   inset: 0;
   z-index: -1;
-  transform: translate(-0.15em, 0.15em);
+  opacity: 0;
 }
 .brand-echo > span { color: var(--c); }
-.brand-word { position: relative; }
+.brand-word {
+  position: relative;
+  -webkit-text-stroke: 0.06em var(--ground);
+  paint-order: stroke fill;
+}
+.brand { cursor: default; -webkit-user-select: none; user-select: none; }
+.brand.play .brand-echo { animation: echo-out 2s cubic-bezier(0.3, 0, 0.3, 1) both; }
+.brand.play .brand-word > span {
+  animation: letter-flash 1.6s step-end both;
+  /* Start each letter one colour further on, and settle left to right. */
+  animation-delay: calc((7 - var(--i)) * -144ms);
+}
+@keyframes echo-out {
+  0% { opacity: 1; transform: translate(0, 0); }
+  18%, 72% { opacity: 1; transform: translate(-0.15em, 0.15em); }
+  100% { opacity: 0; transform: translate(0, 0); }
+}
+@keyframes letter-flash {
+  0% { color: var(--tier1); }
+  9% { color: var(--tier2); }
+  18% { color: var(--tier3); }
+  27% { color: var(--tier4); }
+  36% { color: var(--tier5); }
+  45% { color: var(--tier1); }
+  54% { color: var(--tier2); }
+  63% { color: var(--tier3); }
+  72% { color: var(--tier4); }
+  81% { color: var(--tier5); }
+  90%, 100% { color: var(--ink); }
+}
 .sr-only {
   position: absolute;
   width: 1px;
@@ -387,6 +417,7 @@ button { font: inherit; color: inherit; }
 .card-group h3 span:first-child { font-stretch: 125%; }
 
 @media (prefers-reduced-motion: reduce) {
+  .brand.play .brand-echo, .brand.play .brand-word > span { animation: none; }
   .vehicle, .vehicle.leaving, .body { transition: none; }
   .vehicle.hint .body { animation: none; }
 }
