@@ -2,6 +2,10 @@
 // of coloured plastic: details are only lighter or darker tones laid over
 // the vehicle's own colour. Drawn facing right; vertical vehicles are
 // rotated to face down.
+//
+// The cabin roof is the tallest part, so it is drawn shifted by (ox, oy)
+// to match the camera's view, and the windows stretch between the roof
+// and the body. game.js works out the shift from the vehicle's position.
 (function () {
   'use strict';
 
@@ -12,21 +16,34 @@
   const glint = (x1, y1, x2, y2) =>
     `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#fff" stroke-opacity="0.22" stroke-width="2" stroke-linecap="round"/>`;
 
+  const pt = (x, y) => `${+x.toFixed(1)},${+y.toFixed(1)}`;
+
+  // Glasshouse from the body-level outline b to the roof r, shifted by (ox, oy).
+  function cabin(b, r, ox, oy, rearShade) {
+    const B = [pt(b.x1, b.y1), pt(b.x2, b.y1), pt(b.x2, b.y2), pt(b.x1, b.y2)];
+    const x1 = r.x1 + ox, x2 = r.x2 + ox, y1 = r.y1 + oy, y2 = r.y2 + oy;
+    const R = [pt(x1, y1), pt(x2, y1), pt(x2, y2), pt(x1, y2)];
+    // Windscreen glint: a short stroke across the middle of the windscreen.
+    const gx = (x2 + b.x2) / 2, gy = y1 + 6;
+    return [
+      `<polygon points="${B[0]} ${R[0]} ${R[3]} ${B[3]}" ${dark(rearShade)}/>`,
+      `<polygon points="${B[0]} ${B[1]} ${R[1]} ${R[0]}" ${dark(0.22)}/>`,
+      `<polygon points="${B[3]} ${B[2]} ${R[2]} ${R[3]}" ${dark(0.22)}/>`,
+      `<polygon points="${R[1]} ${B[1]} ${B[2]} ${R[2]}" ${dark(0.4)}/>`,
+      glint(gx - 4, gy + 3, gx + 4, gy),
+      `<rect x="${+x1.toFixed(1)}" y="${+y1.toFixed(1)}" width="${r.x2 - r.x1}" height="${r.y2 - r.y1}" rx="${r.rx}" ${light(0.14)} stroke="#000" stroke-opacity="0.16" stroke-width="2"/>`,
+      glint(x1 + 8, y1 + 7, x2 - 12, y1 + 7),
+    ].join('');
+  }
+
   // 200 x 100 units, front at the right.
-  const CAR = [
+  const car = (ox, oy) => [
     // Boot line and tail lights
     line(30, 18, 30, 82, 0.14),
     `<rect x="5" y="10" width="8" height="16" rx="3" ${dark(0.32)}/>`,
     `<rect x="5" y="74" width="8" height="16" rx="3" ${dark(0.32)}/>`,
-    // Glasshouse: rear window, side windows, windscreen
-    `<polygon points="40,14 58,21 58,79 40,86" ${dark(0.36)}/>`,
-    `<polygon points="42,12 58,19 116,19 140,11" ${dark(0.22)}/>`,
-    `<polygon points="42,88 58,81 116,81 140,89" ${dark(0.22)}/>`,
-    `<polygon points="116,21 140,12 140,88 116,79" ${dark(0.4)}/>`,
-    glint(124, 26, 133, 22),
-    // Raised roof panel
-    `<rect x="58" y="21" width="58" height="58" rx="9" ${light(0.14)} stroke="#000" stroke-opacity="0.16" stroke-width="2"/>`,
-    glint(66, 28, 104, 28),
+    // Rear window, side windows, windscreen and raised roof
+    cabin({ x1: 40, x2: 140, y1: 12, y2: 88 }, { x1: 58, x2: 116, y1: 21, y2: 79, rx: 9 }, ox, oy, 0.36),
     // Wing mirrors
     `<ellipse cx="130" cy="5" rx="6" ry="3" ${dark(0.3)}/>`,
     `<ellipse cx="130" cy="95" rx="6" ry="3" ${dark(0.3)}/>`,
@@ -39,7 +56,7 @@
   ].join('');
 
   // 300 x 100 units, cab at the right.
-  function truck() {
+  function truck(ox, oy) {
     const parts = [
       // Cargo box with moulded ribs
       `<rect x="6" y="6" width="196" height="88" rx="6" ${light(0.1)} stroke="#000" stroke-opacity="0.2" stroke-width="2"/>`,
@@ -52,12 +69,8 @@
     parts.push(
       // Gap between box and cab
       `<rect x="204" y="10" width="6" height="80" rx="2" ${dark(0.38)}/>`,
-      // Cab roof, side windows, windscreen
-      `<rect x="214" y="16" width="32" height="68" rx="7" ${light(0.16)} stroke="#000" stroke-opacity="0.15" stroke-width="2"/>`,
-      `<polygon points="216,10 246,10 262,6 262,12 246,16 216,16" ${dark(0.22)}/>`,
-      `<polygon points="216,90 246,90 262,94 262,88 246,84 216,84" ${dark(0.22)}/>`,
-      `<polygon points="246,17 262,11 262,89 246,83" ${dark(0.42)}/>`,
-      glint(252, 22, 258, 19),
+      // Cab: back wall, side windows, windscreen and roof
+      cabin({ x1: 212, x2: 262, y1: 10, y2: 90 }, { x1: 216, x2: 246, y1: 19, y2: 81, rx: 7 }, ox, oy, 0.3),
       `<ellipse cx="244" cy="4" rx="6" ry="3" ${dark(0.3)}/>`,
       `<ellipse cx="244" cy="96" rx="6" ry="3" ${dark(0.3)}/>`,
       // Bonnet, headlights, grille
@@ -69,11 +82,11 @@
     );
     return parts.join('');
   }
-  const TRUCK = truck();
 
-  window.vehicleArt = function (v) {
+  // ox, oy: roof shift in the vehicle's own units (100 = one cell), facing right.
+  window.vehicleArt = function (v, ox, oy) {
     const len = v.len * 100;
-    const art = v.len === 3 ? TRUCK : CAR;
+    const art = v.len === 3 ? truck(ox || 0, oy || 0) : car(ox || 0, oy || 0);
     const box = v.horiz ? `0 0 ${len} 100` : `0 0 100 ${len}`;
     const inner = v.horiz ? art : `<g transform="translate(100 0) rotate(90)">${art}</g>`;
     return `<svg class="art" viewBox="${box}" preserveAspectRatio="none" aria-hidden="true">${inner}</svg>`;

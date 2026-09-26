@@ -75,7 +75,7 @@
       el.setAttribute('role', 'button');
       el.setAttribute('aria-label', vehicleLabel(i));
       if (i > 0) el.style.setProperty('--c', `var(--v${((i - 1) % 12) + 1})`);
-      el.innerHTML = `<div class="body">${window.vehicleArt(v)}</div>`;
+      el.innerHTML = '<div class="body"></div>';
       el.addEventListener('pointerdown', (e) => onPointerDown(e, i));
       el.addEventListener('keydown', (e) => onKey(e, i));
       gridEl.appendChild(el);
@@ -111,6 +111,7 @@
   // shifts away from the centre and stacked shadows fill in the side walls
   // down to the vehicle's footprint.
   const LAYERS = 6;
+  const ROOF_SHIFT = 10; // largest roof shift, in hundredths of a cell
   function shade(i, p, body) {
     const v = vehicles[i];
     const half = RH.SIZE / 2;
@@ -124,6 +125,18 @@
       walls.push(`${(-dx * k) / LAYERS}px ${(-dy * k) / LAYERS}px 0 var(--side)`);
     }
     body.style.transform = `translate(${dx}px, ${dy}px)`;
+
+    // The cabin roof sits higher than the body, so it shifts further. The
+    // artwork faces right; vertical vehicles are drawn rotated to face down.
+    const sx = ((cx - half) / half) * ROOF_SHIFT;
+    const sy = ((cy - half) / half) * ROOF_SHIFT;
+    const ox = Math.round((v.horiz ? sx : sy) * 2) / 2;
+    const oy = Math.round((v.horiz ? sy : -sx) * 2) / 2;
+    const key = ox + ',' + oy;
+    if (body.dataset.roof !== key) {
+      body.dataset.roof = key;
+      body.innerHTML = window.vehicleArt(v, ox, oy);
+    }
     body.style.boxShadow = [
       'inset 0 -3px 0 rgba(0, 0, 0, 0.18)',
       'inset 0 2px 0 rgba(255, 255, 255, 0.3)',
