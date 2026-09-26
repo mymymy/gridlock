@@ -96,7 +96,7 @@ html, body { margin: 0; }
 body {
   background: var(--ground);
   color: var(--ink);
-  font: 400 15px/1.5 var(--font);
+  font: 400 17px/1.5 var(--font);
   padding: 0 16px;
   -webkit-tap-highlight-color: transparent;
 }
@@ -308,7 +308,7 @@ button { font: inherit; color: inherit; }
 .btn:disabled { opacity: 0.45; cursor: default; }
 .btn-primary { background: var(--marking); border-color: var(--marking); color: #1d2126; padding-inline: 20px; }
 .btn-primary:hover:not(:disabled) { border-color: var(--ink); }
-.help { margin: 0; color: var(--muted); font-size: 14px; min-height: 1.5em; }
+.help { margin: 0; color: var(--muted); min-height: 1.5em; }
 
 /* Card list */
 .cards h2 {
@@ -338,8 +338,8 @@ button { font: inherit; color: inherit; }
   font-weight: 800;
 }
 .card-group .count {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 400;
   color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
