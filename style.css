@@ -56,8 +56,8 @@
   --v5: #de6a9d; --v6: #33a4b6; --v7: #b48a4c; --v8: #78a03c;
   --v9: #4b5ea8; --v10: #c2582f; --v11: #5d8e8a; --v12: #9c5a9a;
 
-  --display: 'Megazoid', 'Overpass', 'Helvetica Neue', Arial, sans-serif;
-  --font: 'Overpass', 'Helvetica Neue', Arial, sans-serif;
+  --display: 'Megazoid', 'Strichpunkt Sans', 'Helvetica Neue', Arial, sans-serif;
+  --font: 'Strichpunkt Sans', 'Helvetica Neue', Arial, sans-serif;
   --mono: 'Overpass Mono', ui-monospace, Menlo, Consolas, monospace;
 }
 @media (prefers-color-scheme: dark) {
