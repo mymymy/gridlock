@@ -225,6 +225,17 @@ button { font: inherit; color: inherit; }
   pointer-events: none;
   transform: translateY(100%);
 }
+.wipe { overflow: hidden; }
+.wipe-number {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font: 700 min(38vw, 30vh)/1 var(--font);
+  font-stretch: 125%;
+  color: #fff;
+}
+.wipe.t2 .wipe-number { color: #1d2126; }
 #board:focus { outline: none; }
 .sr-only {
   position: absolute;

@@ -452,13 +452,25 @@
       }).finished;
     const up = 'translateY(100%)', on = 'translateY(0)', off = 'translateY(-100%)';
     const mainPanel = panels[panels.length - 1];
-    run(mainPanel, up, on, 0, 260)
+    mainPanel.classList.add(`t${main}`);
+    // The level number sits inside the main panel but moves the opposite way,
+    // so it stays still on screen while the panel reveals and hides it.
+    const number = document.createElement('div');
+    number.className = 'wipe-number';
+    number.textContent = n + 1;
+    mainPanel.appendChild(number);
+    const HOLD = 250; // time fully covered, to read the number
+    const down = 'translateY(-100%)', under = 'translateY(100%)';
+    Promise.all([run(mainPanel, up, on, 0, 260), run(number, down, on, 0, 260)])
       .then(() => {
         arrive();
         // Slip the echoes in under the main panel, then leave: the main panel
         // first, the echoes trailing after it.
         panels.slice(0, -1).forEach((el) => { el.style.transform = on; });
-        return Promise.all(panels.map((el, i) => run(el, on, off, (panels.length - 1 - i) * STAGGER, 450)));
+        return Promise.all([
+          run(number, on, under, HOLD, 450),
+          ...panels.map((el, i) => run(el, on, off, HOLD + (panels.length - 1 - i) * STAGGER, 450)),
+        ]);
       })
       .finally(() => {
         panels.forEach((el) => el.remove());
