@@ -48,6 +48,8 @@
   --marking: #f0c02e;
   /* Difficulty colours: Beginner to Grand Master. */
   --tier1: #2e9f78; --tier2: #e3a52a; --tier3: #3b7bd6; --tier4: #d6312a; --tier5: #8a68cf;
+  /* Level colours as display text; green and amber deepen on light grounds (3.2:1+). */
+  --tier1-ink: #298f6b; --tier2-ink: #a3761e; --tier3-ink: var(--tier3); --tier4-ink: var(--tier4); --tier5-ink: var(--tier5);
   --marking-ink: #a87400; /* amber for large display text on light grounds (3.3:1) */
   --red: #d6312a;
   --focus: #1f6fd1;
@@ -74,6 +76,7 @@
     --focus: #6aa8ff;
     --good: #5cc98b;
     --marking-ink: #f0c02e;
+    --tier1-ink: var(--tier1); --tier2-ink: var(--tier2);
     --shadow: rgba(0, 0, 0, 0.6);
   }
 }
@@ -89,6 +92,7 @@
   --focus: #6aa8ff;
   --good: #5cc98b;
   --marking-ink: #f0c02e;
+  --tier1-ink: var(--tier1); --tier2-ink: var(--tier2);
   --shadow: rgba(0, 0, 0, 0.6);
 }
 
@@ -124,7 +128,7 @@ button { font: inherit; color: inherit; }
   letter-spacing: 0.01em;
   text-transform: uppercase;
   font-style: italic;
-  color: var(--marking-ink);
+  color: var(--level-ink, var(--marking-ink));
 }
 /* Wave: each letter rises up and to the right off its resting place,
    trailing a solid extrusion in its colour (--c) back to the base. Letters
@@ -352,7 +356,7 @@ button { font: inherit; color: inherit; }
   font-size: clamp(28px, 9.5vw, 40px);
   line-height: 1;
   font-style: italic;
-  color: var(--marking-ink);
+  color: var(--level-ink, var(--marking-ink));
   --gap: var(--panel);
 }
 .win-body { margin: 0 0 8px; max-width: 34ch; color: var(--ink); white-space: pre-line; text-wrap: balance; }

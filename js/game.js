@@ -317,8 +317,18 @@
     el.classList.add('animate');
   }
 
-  // Fill a .wave element with one span per character, cycling level colours.
-  const WAVE_COLOURS = ['--tier1', '--tier2', '--tier3', '--tier4', '--tier5'];
+  // Wave letters: the face takes the current level's colour, so the
+  // extrusions cycle through the other four level colours.
+  function waveColours() {
+    const current = tier(LEVELS[level].minMoves).cls.slice(1);
+    return ['1', '2', '3', '4', '5'].filter((k) => k !== current).map((k) => `var(--tier${k})`);
+  }
+  function paintWave(el) {
+    const colours = waveColours();
+    [...el.children].forEach((span, i) => span.style.setProperty('--c', colours[i % colours.length]));
+  }
+
+  // Fill a .wave element with one span per character.
   function setWave(el, text) {
     el.dataset.text = text;
     el.style.setProperty('--n', text.length);
@@ -327,9 +337,9 @@
       const span = document.createElement('span');
       span.textContent = ch;
       span.style.setProperty('--i', i);
-      span.style.setProperty('--c', `var(${WAVE_COLOURS[i % WAVE_COLOURS.length]})`);
       el.appendChild(span);
     });
+    paintWave(el);
   }
 
   function win() {
@@ -371,6 +381,8 @@
   function updateHud() {
     const L = LEVELS[level];
     const t = tier(L.minMoves);
+    document.documentElement.style.setProperty('--level-ink', `var(--${t.cls.replace('t', 'tier')}-ink)`);
+    paintWave(document.querySelector('.brand-word'));
     $('card-name').textContent = `Level ${level + 1} of ${LEVELS.length}`;
     $('tier').textContent = t.name;
     $('moves').textContent = history.length;
