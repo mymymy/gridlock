@@ -451,13 +451,21 @@ button { font: inherit; color: inherit; }
   border-top: 5px solid var(--tier-c);
 }
 .card-btn .n { font: 700 18px/1.1 var(--font); font-stretch: 125%; }
+.card-btn .n { position: relative; }
+/* Perfect solves: a large star behind the number in a tint of the tile.
+   Darker under white numbers; lighter on amber, whose number is dark. */
 .card-btn .star {
+  --star: color-mix(in srgb, var(--tier-c) 78%, #000);
   position: absolute;
-  top: 2px;
-  right: 5px;
-  font-size: 13px;
-  line-height: 1;
+  inset: 0;
+  margin: auto;
+  width: 46px;
+  height: 46px;
+  fill: var(--star);
+  stroke: var(--star);
+  stroke-width: 6;
 }
+.card-btn.t2 .star { --star: color-mix(in srgb, var(--tier-c) 60%, #fff); }
 .card-btn[aria-current="true"] { border-color: var(--ink); border-top-color: var(--tier-c); }
 /* Solved levels fill with their difficulty colour. */
 .card-btn.done { background: var(--tier-c); border-color: var(--tier-c); color: #fff; }
