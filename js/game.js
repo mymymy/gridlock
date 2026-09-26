@@ -249,7 +249,7 @@
     clearHint();
     const solution = RH.solve(vehicles, pos);
     if (!solution) {
-      setHelp('No way out from here. Undo a few moves or reset the card.');
+      setHelp('No way out from here. Undo a few moves or reset the level.');
       return;
     }
     const m = solution[0];
@@ -292,7 +292,7 @@
     if (hintsUsed) text += `\nYou used ${hintsUsed} hint${hintsUsed === 1 ? '' : 's'}, so this won’t count as your best.`;
     $('win-body').textContent = text;
     const last = level === LEVELS.length - 1;
-    $('win-next').textContent = last ? 'Back to card 1' : 'Next card';
+    $('win-next').textContent = last ? 'Back to level 1' : 'Next level';
 
     setTimeout(() => {
       $('win').hidden = false;
@@ -306,7 +306,7 @@
   function updateHud() {
     const L = LEVELS[level];
     const t = tier(L.minMoves);
-    $('card-name').textContent = `Card ${level + 1} of ${LEVELS.length}`;
+    $('card-name').textContent = `Level ${level + 1} of ${LEVELS.length}`;
     $('tier').textContent = t.name;
     $('moves').textContent = history.length;
     const best = progress.best[L.board];
@@ -349,7 +349,7 @@
     if (best) b.classList.add('done');
     if (n === level) b.setAttribute('aria-current', 'true');
     b.innerHTML = `<span class="n">${n + 1}</span><span class="p">${best ? '✓ ' + best : '&nbsp;'}</span>`;
-    b.setAttribute('aria-label', `Card ${n + 1}, ${tier(L.minMoves).name}${best ? `, best ${best} moves` : ''}`);
+    b.setAttribute('aria-label', `Level ${n + 1}, ${tier(L.minMoves).name}${best ? `, best ${best} moves` : ''}`);
     b.addEventListener('click', () => startLevel(n));
     li.appendChild(b);
     return li;
