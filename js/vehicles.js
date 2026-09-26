@@ -46,7 +46,7 @@
     `<rect x="5" y="10" width="8" height="16" rx="3" ${dark(0.32)}/>`,
     `<rect x="5" y="74" width="8" height="16" rx="3" ${dark(0.32)}/>`,
     // Rear window, side windows, windscreen and raised roof
-    cabin({ x1: 40, x2: 140, y1: 12, y2: 88 }, { x1: 62, x2: 112, y1: 27, y2: 73, rx: 9 }, ox, oy, 0.36),
+    cabin({ x1: 38, x2: 142, y1: 8, y2: 92 }, { x1: 64, x2: 112, y1: 30, y2: 70, rx: 9 }, ox, oy, 0.36),
     // Wing mirrors
     `<ellipse cx="130" cy="5" rx="6" ry="3" ${dark(0.3)}/>`,
     `<ellipse cx="130" cy="95" rx="6" ry="3" ${dark(0.3)}/>`,
@@ -73,7 +73,7 @@
       // Gap between box and cab
       `<rect x="204" y="10" width="6" height="80" rx="2" ${dark(0.38)}/>`,
       // Cab: back wall, side windows, windscreen and roof
-      cabin({ x1: 212, x2: 262, y1: 10, y2: 90 }, { x1: 222, x2: 244, y1: 25, y2: 75, rx: 7 }, ox, oy, 0.3),
+      cabin({ x1: 212, x2: 264, y1: 8, y2: 92 }, { x1: 224, x2: 244, y1: 30, y2: 70, rx: 7 }, ox, oy, 0.3),
       `<ellipse cx="244" cy="4" rx="6" ry="3" ${dark(0.3)}/>`,
       `<ellipse cx="244" cy="96" rx="6" ry="3" ${dark(0.3)}/>`,
       // Bonnet, headlights, grille
