@@ -264,7 +264,7 @@ button { font: inherit; color: inherit; }
   font-weight: 400;
   font-size: clamp(28px, 9.5vw, 40px);
   line-height: 1;
-  text-transform: uppercase;
+  font-style: italic;
   color: var(--marking-ink);
 }
 .win-body { margin: 0 0 8px; max-width: 30ch; color: var(--ink); white-space: pre-line; }
@@ -370,6 +370,7 @@ button { font: inherit; color: inherit; }
 .exit span,
 .stats dt,
 .cards h2,
+.btn,
 .card-group h3 span:first-child { font-stretch: 125%; }
 
 @media (prefers-reduced-motion: reduce) {
