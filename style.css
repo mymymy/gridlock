@@ -48,7 +48,7 @@
   --marking: #f0c02e;
   /* Difficulty colours: Beginner to Grand Master. */
   --tier1: #2e9f78; --tier2: #e3a52a; --tier3: #3b7bd6; --tier4: #d6312a; --tier5: #8a68cf;
-  --marking-ink: #8f6500; /* yellow dark enough to read as text on light grounds */
+  --marking-ink: #a87400; /* amber for large display text on light grounds (3.3:1) */
   --red: #d6312a;
   --focus: #1f6fd1;
   --good: #2c8a57;
@@ -124,6 +124,7 @@ button { font: inherit; color: inherit; }
   letter-spacing: 0.01em;
   text-transform: uppercase;
   font-style: italic;
+  color: var(--marking-ink);
 }
 /* Wave: each letter rises up and to the right off its resting place,
    trailing a solid extrusion in its colour (--c) back to the base. Letters
