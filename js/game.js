@@ -310,6 +310,28 @@
     return list[i];
   }
 
+  // Restart an element's CSS wave animation.
+  function replay(el) {
+    el.classList.remove('animate');
+    void el.offsetWidth;
+    el.classList.add('animate');
+  }
+
+  // Fill a .wave element with one span per character, cycling level colours.
+  const WAVE_COLOURS = ['--tier1', '--tier2', '--tier3', '--tier4', '--tier5'];
+  function setWave(el, text) {
+    el.dataset.text = text;
+    el.style.setProperty('--n', text.length);
+    el.textContent = '';
+    [...text].forEach((ch, i) => {
+      const span = document.createElement('span');
+      span.textContent = ch;
+      span.style.setProperty('--i', i);
+      span.style.setProperty('--c', `var(${WAVE_COLOURS[i % WAVE_COLOURS.length]})`);
+      el.appendChild(span);
+    });
+  }
+
   function win() {
     solved = true;
     const moves = history.length;
@@ -330,13 +352,15 @@
     if (hintsUsed) {
       text += `\nYou had ${hintsUsed === 1 ? 'a little nudge' : 'a few nudges'} from the hints,\nso this one doesn’t go on your record.`;
     }
-    $('win-title').textContent = pick(PRAISE[kind].titles, kind + '-title');
+    setWave($('win-title'), pick(PRAISE[kind].titles, kind + '-title'));
+    $('win-title-text').textContent = $('win-title').dataset.text;
     $('win-body').textContent = text;
     const last = level === LEVELS.length - 1;
     $('win-next').textContent = last ? 'Back to level 1' : 'Next level';
 
     setTimeout(() => {
       $('win').hidden = false;
+      replay($('win-title'));
       $('win-next').focus({ preventScroll: true });
     }, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 560);
     updateHud();
@@ -401,13 +425,8 @@
 
   // Title intro; tap the title to play it again.
   const brand = document.querySelector('.brand');
-  function playTitle() {
-    brand.classList.remove('play');
-    void brand.offsetWidth; // restart the CSS animations
-    brand.classList.add('play');
-  }
-  brand.addEventListener('click', playTitle);
-  playTitle();
+  brand.addEventListener('click', () => replay(brand));
+  replay(brand);
 
   $('undo').addEventListener('click', undo);
   $('reset').addEventListener('click', reset);

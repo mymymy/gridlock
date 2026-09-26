@@ -125,37 +125,38 @@ button { font: inherit; color: inherit; }
   text-transform: uppercase;
   font-style: italic;
 }
-/* Title intro, a Mexican wave: each letter rises up and to the right off
-   its resting place, trailing a solid extrusion in its level colour back to
-   the base, then sinks back. Letters further left paint on top, so an
-   extrusion never covers another letter's face. game.js adds .play on load
-   and when the title is tapped. */
-.brand-stack { position: relative; display: inline-block; }
-.brand-word {
+/* Wave: each letter rises up and to the right off its resting place,
+   trailing a solid extrusion in its colour (--c) back to the base. Letters
+   rise left to right, all hold up together for a moment, then sink left to
+   right, each drop quicker than the last. Letters further left paint on top,
+   so an extrusion never covers another letter's face. Used by the title and
+   the success headline (game.js adds .animate): --n is the letter count, --gap the colour behind. */
+.wave {
   position: relative;
-  -webkit-text-stroke: 0.06em var(--ground);
+  -webkit-text-stroke: 0.06em var(--gap, var(--ground));
   paint-order: stroke fill;
 }
-.brand-word > span {
+.wave > span {
   position: relative;
   display: inline-block;
-  z-index: calc(10 - var(--i));
+  z-index: calc(20 - var(--i));
+  white-space: pre;
 }
-.brand { cursor: default; -webkit-user-select: none; user-select: none; }
-/* Rise left to right, hold with every letter up for a moment, then sink
-   left to right. The last letter is up at 1230ms; the first sinks at 1480ms. */
-.brand.play .brand-word > span {
+.animate .wave > span,
+.wave.animate > span {
   animation:
     letter-rise 450ms cubic-bezier(0.2, 0.7, 0.3, 1) forwards,
     letter-sink 260ms cubic-bezier(0.55, 0, 1, 0.45) forwards;
-  /* The sink accelerates along the word: each letter drops 20ms quicker
-     than the last (260ms down to 120ms) and the gaps between drops shrink
-     from 60ms to 30ms. */
-  animation-duration: 450ms, calc(260ms - var(--i) * 20ms);
+  /* Sink drops run 260ms down in 20ms steps (never under 100ms); the gaps
+     between drops shrink from 60ms by 5ms a letter. The sink starts 250ms
+     after the last letter is up. */
+  animation-duration: 450ms, max(100ms, calc(260ms - var(--i) * 20ms));
   animation-delay:
     calc(150ms + var(--i) * 90ms),
-    calc(1480ms + var(--i) * 62.5ms - var(--i) * var(--i) * 2.5ms);
+    calc(150ms + (var(--n) - 1) * 90ms + 700ms + var(--i) * 62.5ms - var(--i) * var(--i) * 2.5ms);
 }
+.brand-stack { position: relative; display: inline-block; }
+.brand { cursor: default; -webkit-user-select: none; user-select: none; }
 @keyframes letter-rise {
   from {
     transform: translate(0, 0);
@@ -343,7 +344,7 @@ button { font: inherit; color: inherit; }
   border-radius: 14px;
 }
 .win-title {
-  text-wrap: balance;
+  white-space: nowrap;
   margin: 0;
   font-family: var(--display);
   font-weight: 400;
@@ -351,6 +352,7 @@ button { font: inherit; color: inherit; }
   line-height: 1;
   font-style: italic;
   color: var(--marking-ink);
+  --gap: var(--panel);
 }
 .win-body { margin: 0 0 8px; max-width: 34ch; color: var(--ink); white-space: pre-line; text-wrap: balance; }
 
@@ -459,7 +461,7 @@ button { font: inherit; color: inherit; }
 .card-group h3 span:first-child { font-stretch: 125%; }
 
 @media (prefers-reduced-motion: reduce) {
-  .brand.play .brand-word > span { animation: none; }
+  .animate .wave > span, .wave.animate > span { animation: none; }
   .vehicle, .vehicle.leaving, .body { transition: none; }
   .vehicle.hint .body { animation: none; }
 }
