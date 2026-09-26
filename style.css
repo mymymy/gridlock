@@ -7,6 +7,13 @@
   font-display: swap;
 }
 @font-face {
+  font-family: 'Megazoid';
+  src: url('fonts/Megazoid-Italic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
   font-family: 'Megazoid Fill';
   src: url('fonts/Megazoid-Fill.woff2') format('woff2');
   font-weight: 400;
