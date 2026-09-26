@@ -288,11 +288,11 @@
     longer: {
       titles: ['Well done', 'Road clear', 'Beep beep', 'You’re out', 'Freedom', 'Nailed it'],
       bodies: [
-        ['You got out in {n} moves.', 'There’s a {s}-move shortcut, if you fancy another go.'],
+        ['You got out in {n} moves.', 'It can be done in just {s}, if you fancy another go.'],
         ['Free at last, in {n} moves.', 'The scenic route, mind: it can be done in {s}.'],
         ['Escaped in {n} moves.', 'A tidier driver could do it in {s}. Just saying.'],
         ['You made it in {n} moves.', 'The shortest route takes {s}, but who’s counting? (We are.)'],
-        ['{n} moves and the red car is away.', 'Rumour has it {s} would do.'],
+        ['{n} moves and the red car is away.', 'Rumour has it {s} moves would do.'],
         ['Out in {n}. The queue behind you is grateful.', 'The shortest route takes {s}.'],
       ],
     },
