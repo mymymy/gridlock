@@ -36,11 +36,11 @@
     } catch (e) { /* storage unavailable */ }
   }
 
-  function tier(par) {
-    if (par <= 7) return { name: 'Beginner', cls: 't1' };
-    if (par <= 14) return { name: 'Intermediate', cls: 't2' };
-    if (par <= 21) return { name: 'Advanced', cls: 't3' };
-    if (par <= 34) return { name: 'Expert', cls: 't4' };
+  function tier(minMoves) {
+    if (minMoves <= 7) return { name: 'Beginner', cls: 't1' };
+    if (minMoves <= 14) return { name: 'Intermediate', cls: 't2' };
+    if (minMoves <= 21) return { name: 'Advanced', cls: 't3' };
+    if (minMoves <= 34) return { name: 'Expert', cls: 't4' };
     return { name: 'Grand Master', cls: 't5' };
   }
 
@@ -219,8 +219,7 @@
     els[m.vehicle].classList.add('hint');
     hint = { vehicle: m.vehicle, ghost };
     hintsUsed++;
-    const left = solution.length;
-    setHelp(`Slide the flashing vehicle to the dashed outline. ${left} move${left === 1 ? '' : 's'} to go from here.`);
+    setHelp('Slide the flashing vehicle to the dashed outline.');
   }
 
   function clearHint() {
@@ -235,7 +234,7 @@
   function win() {
     solved = true;
     const moves = history.length;
-    const par = LEVELS[level].par;
+    const shortest = LEVELS[level].minMoves;
     const key = LEVELS[level].board;
     const prev = progress.best[key];
     if (!hintsUsed && (!prev || moves < prev)) progress.best[key] = moves;
@@ -246,9 +245,9 @@
     red.style.left = RH.SIZE * UNIT + 4 + '%';
 
     let text =
-      moves === par
-        ? `${moves} moves, matching par. You found the shortest route.`
-        : `${moves} moves. Par is ${par}, so there’s a shorter route.`;
+      moves === shortest
+        ? `You solved it in ${moves} moves. That’s the shortest possible route.`
+        : `You solved it in ${moves} moves. The shortest route takes ${shortest}.`;
     if (hintsUsed) text += ` You used ${hintsUsed} hint${hintsUsed === 1 ? '' : 's'}, so this won’t count as your best.`;
     $('win-body').textContent = text;
     const last = level === LEVELS.length - 1;
@@ -265,14 +264,13 @@
   // ---- HUD ----
   function updateHud() {
     const L = LEVELS[level];
-    const t = tier(L.par);
+    const t = tier(L.minMoves);
     $('card-name').textContent = `Card ${level + 1} of ${LEVELS.length}`;
     $('tier').textContent = t.name;
     $('moves').textContent = history.length;
-    $('par').textContent = L.par;
     const best = progress.best[L.board];
     $('best').textContent = best ? best : '–';
-    $('best').classList.toggle('under', !!best && best <= L.par);
+    $('best').classList.toggle('under', !!best && best <= L.minMoves);
     $('undo').disabled = solved || !history.length;
     $('reset').disabled = !solved && !history.length;
     $('hint').disabled = solved;
@@ -289,12 +287,12 @@
       const li = document.createElement('li');
       const b = document.createElement('button');
       b.type = 'button';
-      b.className = 'card-btn ' + tier(L.par).cls;
+      b.className = 'card-btn ' + tier(L.minMoves).cls;
       const best = progress.best[L.board];
       if (best) b.classList.add('done');
       if (n === level) b.setAttribute('aria-current', 'true');
-      b.innerHTML = `<span class="n">${n + 1}</span><span class="p">${best ? '✓ ' + best : 'par ' + L.par}</span>`;
-      b.setAttribute('aria-label', `Card ${n + 1}, ${tier(L.par).name}, par ${L.par}${best ? `, best ${best}` : ''}`);
+      b.innerHTML = `<span class="n">${n + 1}</span><span class="p">${best ? '✓ ' + best : '&nbsp;'}</span>`;
+      b.setAttribute('aria-label', `Card ${n + 1}, ${tier(L.minMoves).name}${best ? `, best ${best} moves` : ''}`);
       b.addEventListener('click', () => startLevel(n));
       li.appendChild(b);
       list.appendChild(li);

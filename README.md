@@ -17,7 +17,7 @@ Play online at https://mymymy.github.io/rush-hour/ or open `index.html` in a bro
 | File | What it does |
 | --- | --- |
 | `js/solver.js` | Board model and breadth-first solver. Works in the browser and Node. |
-| `js/levels.js` | The challenge cards, each with its par (minimum moves). Generated. |
+| `js/levels.js` | The challenge cards, each with the fewest moves that solve it. Generated. |
 | `js/game.js` | Rendering, drag and keyboard input, move counting, hints, progress. |
 | `tools/generate.js` | Makes `js/levels.js`. Explores every position reachable from a layout and picks one at a chosen distance from a solution. Easy cards come from random layouts; hard ones from hill climbing (add, remove or move a vehicle, keep the change if the puzzle gets no easier). Takes about 3 minutes. |
 | `tools/bundle.js` | Inlines everything into a single `dist/index.html`. |
@@ -31,7 +31,7 @@ Every push to `main` runs the tests and publishes the game to GitHub Pages (`.gi
 ## Scripts
 
 ```sh
-npm test              # solver tests and a par check on every level
+npm test              # solver tests and a minimum-moves check on every level
 npm run generate      # regenerate levels (optional seed: npm run generate -- 7)
 npm run bundle        # write dist/index.html
 ```

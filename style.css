@@ -220,7 +220,7 @@ button { font: inherit; color: inherit; }
 .win-title {
   margin: 0;
   font-weight: 900;
-  font-size: 44px;
+  font-size: 40px;
   line-height: 1;
   text-transform: uppercase;
   color: var(--red);
@@ -231,7 +231,7 @@ button { font: inherit; color: inherit; }
 .stats {
   margin: 0;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   border-block: 1px solid var(--rule);
 }
 .stats div { padding: 10px 0; display: grid; gap: 2px; justify-items: center; }

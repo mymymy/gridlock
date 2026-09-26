@@ -34,13 +34,13 @@ test('rejects a red car off the exit row', () => {
   assert.throws(() => RH.parse('AA' + '.'.repeat(34)));
 });
 
-test('every level is solvable in exactly its par', () => {
+test('every level is solvable in exactly its minimum moves', () => {
   global.window = {};
   require('../js/levels.js');
   const levels = global.window.RUSH_HOUR_LEVELS;
   assert.ok(levels.length > 0);
-  for (const { board, par } of levels) {
+  for (const { board, minMoves } of levels) {
     const { vehicles, pos } = RH.parse(board);
-    assert.strictEqual(RH.solve(vehicles, pos).length, par, board);
+    assert.strictEqual(RH.solve(vehicles, pos).length, minMoves, board);
   }
 });
