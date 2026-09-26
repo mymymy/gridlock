@@ -36,13 +36,15 @@
     } catch (e) { /* storage unavailable */ }
   }
 
-  function tier(minMoves) {
-    if (minMoves <= 7) return { name: 'Beginner', cls: 't1' };
-    if (minMoves <= 14) return { name: 'Intermediate', cls: 't2' };
-    if (minMoves <= 21) return { name: 'Advanced', cls: 't3' };
-    if (minMoves <= 34) return { name: 'Expert', cls: 't4' };
-    return { name: 'Grand Master', cls: 't5' };
-  }
+  // Difficulty levels by fewest moves to solve. Limits match tools/generate.js.
+  const TIERS = [
+    { name: 'Beginner', cls: 't1', upTo: 7 },
+    { name: 'Intermediate', cls: 't2', upTo: 14 },
+    { name: 'Advanced', cls: 't3', upTo: 21 },
+    { name: 'Expert', cls: 't4', upTo: 34 },
+    { name: 'Grand Master', cls: 't5', upTo: Infinity },
+  ];
+  const tier = (minMoves) => TIERS.find((t) => minMoves <= t.upTo);
 
   // ---- Level setup ----
   function startLevel(n) {
@@ -281,23 +283,39 @@
   }
 
   function renderCards() {
-    const list = $('card-list');
-    list.textContent = '';
-    LEVELS.forEach((L, n) => {
-      const li = document.createElement('li');
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'card-btn ' + tier(L.minMoves).cls;
-      const best = progress.best[L.board];
-      if (best) b.classList.add('done');
-      if (n === level) b.setAttribute('aria-current', 'true');
-      b.innerHTML = `<span class="n">${n + 1}</span><span class="p">${best ? '✓ ' + best : '&nbsp;'}</span>`;
-      b.setAttribute('aria-label', `Card ${n + 1}, ${tier(L.minMoves).name}${best ? `, best ${best} moves` : ''}`);
-      b.addEventListener('click', () => startLevel(n));
-      li.appendChild(b);
-      list.appendChild(li);
-    });
+    const groups = $('card-groups');
+    groups.textContent = '';
+    for (const t of TIERS) {
+      const members = LEVELS.map((L, n) => n).filter((n) => tier(LEVELS[n].minMoves) === t);
+      if (!members.length) continue;
+      const solved = members.filter((n) => progress.best[LEVELS[n].board]).length;
+      const group = document.createElement('section');
+      group.className = 'card-group';
+      group.innerHTML = `<h3><span>${t.name}</span><span class="count">${solved} of ${members.length} solved</span></h3>`;
+      const list = document.createElement('ol');
+      list.className = 'card-list';
+      members.forEach((n) => list.appendChild(cardButton(n)));
+      group.appendChild(list);
+      groups.appendChild(group);
+    }
   }
+
+  function cardButton(n) {
+    const L = LEVELS[n];
+    const li = document.createElement('li');
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'card-btn ' + tier(L.minMoves).cls;
+    const best = progress.best[L.board];
+    if (best) b.classList.add('done');
+    if (n === level) b.setAttribute('aria-current', 'true');
+    b.innerHTML = `<span class="n">${n + 1}</span><span class="p">${best ? '✓ ' + best : '&nbsp;'}</span>`;
+    b.setAttribute('aria-label', `Card ${n + 1}, ${tier(L.minMoves).name}${best ? `, best ${best} moves` : ''}`);
+    b.addEventListener('click', () => startLevel(n));
+    li.appendChild(b);
+    return li;
+  }
+
 
   $('undo').addEventListener('click', undo);
   $('reset').addEventListener('click', reset);

@@ -10,23 +10,28 @@
 // targets come from hill climbing: repeatedly add, remove or move a vehicle,
 // keeping the change whenever the hardest reachable position gets no easier.
 //
-// Usage: node tools/generate.js [seed]
+// Usage: node tools/generate.js [seed] [--keep]
+//   --keep  keep cards already in js/levels.js and only search for missing ones
 'use strict';
 
 const fs = require('fs');
 const path = require('path');
 const RH = require('../js/solver.js');
 
+// Ten cards per difficulty level. Tier limits match tier() in js/game.js.
 const TARGETS = [
-  3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
-  13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
-  24, 26, 28, 30, 32, 34, 36, 38, 40, 42,
-  44,
+  3, 3, 4, 4, 5, 5, 6, 6, 7, 7, // Beginner (up to 7)
+  8, 9, 9, 10, 11, 11, 12, 13, 13, 14, // Intermediate (8-14)
+  15, 16, 16, 17, 18, 18, 19, 20, 20, 21, // Advanced (15-21)
+  22, 23, 25, 26, 27, 29, 30, 31, 33, 34, // Expert (22-34)
+  35, 35, 35, 36, 36, 37, 38, 39, 40, 41, // Grand Master (35+)
 ];
 const RANDOM_BUDGET_MS = 20000;
-const TIME_BUDGET_MS = 180000;
+const TIME_BUDGET_MS = 600000;
 const RESTART_AFTER = 400; // hill-climbing steps without improvement
+const PER_LINEAGE = 2; // cards taken from one climb before starting afresh
 const MAX_COMPONENT = 50000;
+const LEVELS_FILE = path.join(__dirname, '..', 'js', 'levels.js');
 
 // Small seeded PRNG (mulberry32) so a seed always gives the same levels.
 function rng(seed) {
@@ -124,15 +129,20 @@ function relabel(board) {
 }
 
 // Fill the hardest open target this component can reach, if any.
-function harvest(result, vehicles, open, byMoves, rand, note) {
-  const target = [...open].filter((t) => t <= result.max).sort((a, b) => b - a)[0];
-  if (target === undefined) return;
+// open is a list of targets (with repeats); found maps target -> boards.
+function harvest(result, vehicles, open, found, used, rand, note) {
+  const target = open.filter((t) => t <= result.max).sort((a, b) => b - a)[0];
+  if (target === undefined) return false;
   const matches = [];
   for (const [k, d] of result.dist) if (d === target) matches.push(k);
-  const k = matches[Math.floor(rand() * matches.length)];
-  byMoves.set(target, relabel(RH.stringify(vehicles, result.seen.get(k))));
-  open.delete(target);
-  console.log(`${String(target).padStart(2)} moves: found ${note}`);
+  const board = relabel(RH.stringify(vehicles, result.seen.get(matches[Math.floor(rand() * matches.length)])));
+  if (used.has(board)) return false;
+  used.add(board);
+  if (!found.has(target)) found.set(target, []);
+  found.get(target).push(board);
+  open.splice(open.indexOf(target), 1);
+  console.log(`${String(target).padStart(2)} moves: found ${note} (${open.length} to go)`);
+  return true;
 }
 
 function evaluate(board) {
@@ -189,30 +199,48 @@ function mutate(board, rand) {
 }
 
 function main() {
-  const seed = Number(process.argv[2] || 2026);
+  const args = process.argv.slice(2);
+  const seed = Number(args.find((a) => /^\d+$/.test(a)) || 2026);
+  const keep = args.includes('--keep');
   const rand = rng(seed);
   const started = Date.now();
   const elapsed = () => Date.now() - started;
-  const byMoves = new Map(); // minimum moves -> board
-  const open = new Set(TARGETS);
+  const found = new Map(); // minimum moves -> boards
+  const used = new Set();
+  const open = TARGETS.slice();
+  if (keep) {
+    const text = fs.readFileSync(LEVELS_FILE, 'utf8');
+    for (const [, board, moves] of text.matchAll(/board: '([A-Z.]{36})', minMoves: (\d+)/g)) {
+      const i = open.indexOf(Number(moves));
+      if (i === -1 || used.has(board)) continue;
+      open.splice(i, 1);
+      used.add(board);
+      if (!found.has(Number(moves))) found.set(Number(moves), []);
+      found.get(Number(moves)).push(board);
+    }
+    console.log(`Kept ${used.size} cards; searching for ${open.length}`);
+  }
 
   // Phase 1: random layouts. Each fills the hardest target it can still
   // reach, so easy and hard puzzles come from different layouts.
-  for (let tries = 0; open.size && elapsed() < RANDOM_BUDGET_MS; tries++) {
+  for (let tries = 0; open.length && elapsed() < RANDOM_BUDGET_MS; tries++) {
     const e = evaluate(randomLayout(rand));
-    if (e) harvest(e.result, e.vehicles, open, byMoves, rand, `after ${tries} random layouts`);
+    if (e) harvest(e.result, e.vehicles, open, found, used, rand, `after ${tries} random layouts`);
   }
 
-  // Phase 2: hill climbing towards the remaining (harder) targets.
+  // Phase 2: hill climbing towards the remaining (harder) targets. Each
+  // climb gives at most PER_LINEAGE cards, so hard cards don't look alike.
   let current = null;
   let stale = 0;
+  let taken = 0;
   let best = 0;
-  for (let steps = 0; open.size && elapsed() < TIME_BUDGET_MS; steps++) {
-    if (!current || stale > RESTART_AFTER) {
+  for (let steps = 0; open.length && elapsed() < TIME_BUDGET_MS; steps++) {
+    if (!current || stale > RESTART_AFTER || taken >= PER_LINEAGE) {
       const e = evaluate(randomLayout(rand));
       if (!e) continue;
       current = { board: e.result.hardest, max: e.result.max };
       stale = 0;
+      taken = 0;
     }
     const e = evaluate(mutate(current.board, rand));
     if (!e || e.result.max < current.max) {
@@ -222,13 +250,13 @@ function main() {
     stale = e.result.max > current.max ? 0 : stale + 1;
     current = { board: e.result.hardest, max: e.result.max };
     if (current.max > best) best = current.max;
-    harvest(e.result, e.vehicles, open, byMoves, rand, `by hill climbing (${(elapsed() / 1000).toFixed(0)}s)`);
+    if (harvest(e.result, e.vehicles, open, found, used, rand, `by hill climbing (${(elapsed() / 1000).toFixed(0)}s)`)) taken++;
   }
-  if (open.size) console.warn(`Not found in time: ${[...open].join(', ')} (hardest seen: ${best})`);
+  if (open.length) console.warn(`Not found in time: ${open.join(', ')} (hardest seen: ${best})`);
 
   const levels = [];
   for (const target of TARGETS) {
-    const board = byMoves.get(target);
+    const board = (found.get(target) || []).shift();
     if (!board) continue;
     // Check the minimum independently with the solver the game uses.
     const p = RH.parse(board);
@@ -238,12 +266,12 @@ function main() {
   }
 
   const out =
-    '// Generated by tools/generate.js (seed ' + seed + '). Do not edit by hand.\n' +
+    '// Generated by tools/generate.js (seed ' + seed + (keep ? ', topping up earlier cards' : '') + '). Do not edit by hand.\n' +
     '// board: 36 cells row by row, "." empty, "A" red car. minMoves: fewest moves to solve.\n' +
     'window.RUSH_HOUR_LEVELS = [\n' +
     levels.map((l) => `  { board: '${l.board}', minMoves: ${l.minMoves} },`).join('\n') +
     '\n];\n';
-  fs.writeFileSync(path.join(__dirname, '..', 'js', 'levels.js'), out);
+  fs.writeFileSync(LEVELS_FILE, out);
   console.log(`Wrote ${levels.length} levels in ${((Date.now() - started) / 1000).toFixed(1)}s`);
 }
 

@@ -6,6 +6,7 @@ A browser prototype of the Rush Hour sliding-block puzzle. Slide cars and trucks
 
 Play online at https://mymymy.github.io/rush-hour/ or open `index.html` in a browser. There’s no build step and no dependencies.
 
+- 50 challenge cards: ten each at Beginner, Intermediate, Advanced, Expert and Grand Master.
 - Drag a vehicle to slide it. Keyboard: Tab to a vehicle, then use the arrow keys.
 - Sliding the same vehicle twice in a row counts as one move, as on the real board.
 - **Hint** shows the next move on a shortest route from where you are.
@@ -19,7 +20,7 @@ Play online at https://mymymy.github.io/rush-hour/ or open `index.html` in a bro
 | `js/solver.js` | Board model and breadth-first solver. Works in the browser and Node. |
 | `js/levels.js` | The challenge cards, each with the fewest moves that solve it. Generated. |
 | `js/game.js` | Rendering, drag and keyboard input, move counting, hints, progress. |
-| `tools/generate.js` | Makes `js/levels.js`. Explores every position reachable from a layout and picks one at a chosen distance from a solution. Easy cards come from random layouts; hard ones from hill climbing (add, remove or move a vehicle, keep the change if the puzzle gets no easier). Takes about 3 minutes. |
+| `tools/generate.js` | Makes `js/levels.js`. Explores every position reachable from a layout and picks one at a chosen distance from a solution. Easy cards come from random layouts; hard ones from hill climbing (add, remove or move a vehicle, keep the change if the puzzle gets no easier). Takes up to 10 minutes. |
 | `tools/bundle.js` | Inlines everything into a single `dist/index.html`. |
 
 A board is a 36-character string read row by row: `.` is empty, `A` is the red car and other letters are vehicles.

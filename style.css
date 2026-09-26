@@ -281,8 +281,24 @@ button { font: inherit; color: inherit; }
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(62px, 1fr));
+  grid-template-columns: repeat(5, 1fr);
   gap: 8px;
+}
+.card-groups { display: grid; gap: 20px; }
+.card-group h3 {
+  margin: 0 0 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  font-size: 15px;
+  font-weight: 800;
+}
+.card-group .count {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
 }
 .card-btn {
   width: 100%;
