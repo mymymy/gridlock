@@ -111,7 +111,7 @@
   // shifts away from the centre and stacked shadows fill in the side walls
   // down to the vehicle's footprint.
   const LAYERS = 6;
-  const ROOF_SHIFT = 26; // largest roof shift, in hundredths of a cell
+  const ROOF_SHIFT = 18; // largest roof shift, in hundredths of a cell
   function shade(i, p, body) {
     const v = vehicles[i];
     const half = RH.SIZE / 2;
