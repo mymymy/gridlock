@@ -33,8 +33,8 @@
     // Bonnet creases, headlights, grille
     line(142, 26, 184, 32, 0.18),
     line(142, 74, 184, 68, 0.18),
-    `<rect x="180" y="10" width="12" height="16" rx="4" ${light(0.55)}/>`,
-    `<rect x="180" y="74" width="12" height="16" rx="4" ${light(0.55)}/>`,
+    `<rect x="180" y="10" width="12" height="16" rx="4" ${light(0.28)}/>`,
+    `<rect x="180" y="74" width="12" height="16" rx="4" ${light(0.28)}/>`,
     `<rect x="193" y="34" width="3" height="32" rx="1.5" ${dark(0.28)}/>`,
   ].join('');
 
@@ -63,8 +63,8 @@
       // Bonnet, headlights, grille
       line(264, 28, 286, 33, 0.18),
       line(264, 72, 286, 67, 0.18),
-      `<rect x="282" y="10" width="11" height="15" rx="4" ${light(0.55)}/>`,
-      `<rect x="282" y="75" width="11" height="15" rx="4" ${light(0.55)}/>`,
+      `<rect x="282" y="10" width="11" height="15" rx="4" ${light(0.28)}/>`,
+      `<rect x="282" y="75" width="11" height="15" rx="4" ${light(0.28)}/>`,
       `<rect x="294" y="30" width="3" height="40" rx="1.5" ${dark(0.3)}/>`
     );
     return parts.join('');
