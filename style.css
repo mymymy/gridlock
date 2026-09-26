@@ -97,7 +97,6 @@ body {
   background: var(--ground);
   color: var(--ink);
   font: 400 15px/1.5 var(--font);
-  font-stretch: 125%;
   padding: 0 16px;
   -webkit-tap-highlight-color: transparent;
 }
@@ -364,6 +363,13 @@ button { font: inherit; color: inherit; }
 .t3 { --tier-c: #3b7bd6; }
 .t4 { --tier-c: #d6312a; }
 .t5 { --tier-c: #8a68cf; }
+
+/* Wide cut of Special Gothic for subheadings and labels; body text stays regular width. */
+.card-label,
+.exit span,
+.stats dt,
+.cards h2,
+.card-group h3 span:first-child { font-stretch: 125%; }
 
 @media (prefers-reduced-motion: reduce) {
   .vehicle, .vehicle.leaving, .body { transition: none; }
