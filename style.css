@@ -218,6 +218,14 @@ button { font: inherit; color: inherit; }
     0 0 0 transparent;
   }
 }
+.wipe {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  transform: translateX(-100%);
+}
+#board:focus { outline: none; }
 .sr-only {
   position: absolute;
   width: 1px;
