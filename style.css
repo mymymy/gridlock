@@ -123,22 +123,26 @@ button { font: inherit; color: inherit; }
   text-transform: uppercase;
   font-style: italic;
 }
-/* Copies of the title stacked behind it, each nudged further up or down,
-   after DJR's Roadway poster. A background-coloured outline keeps each copy
-   distinct from the one in front. They overlap the title's existing space. */
-.brand-stack { position: relative; display: inline-block; }
-.brand-word,
-.echo {
-  -webkit-text-stroke: 0.07em var(--ground);
-  paint-order: stroke fill;
+/* Each letter of the title gets a solid extrusion down and to the left in
+   its own colour, for a retro 3D look. */
+.brand-word > span {
+  text-shadow:
+    -0.0125em 0.0125em 0 var(--c),
+    -0.0250em 0.0250em 0 var(--c),
+    -0.0375em 0.0375em 0 var(--c),
+    -0.0500em 0.0500em 0 var(--c),
+    -0.0625em 0.0625em 0 var(--c),
+    -0.0750em 0.0750em 0 var(--c),
+    -0.0875em 0.0875em 0 var(--c),
+    -0.1000em 0.1000em 0 var(--c);
 }
-.brand-word { position: relative; }
-.echoes { position: absolute; inset: 0; pointer-events: none; }
-.echo {
+.sr-only {
   position: absolute;
-  inset: 0;
-  color: var(--marking);
-  transform: translateY(calc(var(--y) * 1em));
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 .brand::after {
   content: '';
