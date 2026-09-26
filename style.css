@@ -99,10 +99,14 @@
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 html, body { margin: 0; }
+html { overflow-x: clip; }
 body {
   background: var(--ground);
   color: var(--ink);
   font: 400 17px/1.5 var(--font);
+  /* The departing red car slides past the board edge; clip it so the page
+     never widens (which made phones zoom out). */
+  overflow-x: clip;
   padding: 0 16px;
   -webkit-tap-highlight-color: transparent;
 }
