@@ -4,7 +4,7 @@ A browser prototype of the Rush Hour sliding-block puzzle. Slide cars and trucks
 
 ## Play
 
-Open `index.html` in a browser. There’s no build step and no dependencies.
+Play online at https://mymymy.github.io/rush-hour/ or open `index.html` in a browser. There’s no build step and no dependencies.
 
 - Drag a vehicle to slide it. Keyboard: Tab to a vehicle, then use the arrow keys.
 - Sliding the same vehicle twice in a row counts as one move, as on the real board.
@@ -23,6 +23,10 @@ Open `index.html` in a browser. There’s no build step and no dependencies.
 | `tools/bundle.js` | Inlines everything into a single `dist/index.html`. |
 
 A board is a 36-character string read row by row: `.` is empty, `A` is the red car and other letters are vehicles.
+
+## Deployment
+
+Every push to `main` runs the tests and publishes the game to GitHub Pages (`.github/workflows/pages.yml`).
 
 ## Scripts
 
