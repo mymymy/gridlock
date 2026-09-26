@@ -445,7 +445,7 @@
       document.body.appendChild(el);
       return el;
     });
-    const STAGGER = 10;
+    const STAGGER = 25;
     const run = (el, from, to, delay, duration) =>
       el.animate([{ transform: from }, { transform: to }], {
         duration, delay, easing: 'cubic-bezier(0.65, 0, 0.35, 1)', fill: 'forwards',
@@ -458,7 +458,7 @@
         // Slip the echoes in under the main panel, then leave: the main panel
         // first, the echoes trailing after it.
         panels.slice(0, -1).forEach((el) => { el.style.transform = on; });
-        return Promise.all(panels.map((el, i) => run(el, on, off, (panels.length - 1 - i) * STAGGER, 300)));
+        return Promise.all(panels.map((el, i) => run(el, on, off, (panels.length - 1 - i) * STAGGER, 450)));
       })
       .finally(() => {
         panels.forEach((el) => el.remove());
