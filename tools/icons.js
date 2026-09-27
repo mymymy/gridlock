@@ -8,7 +8,7 @@ const path = require('path');
 const root = path.join(__dirname, '..');
 const SIZES = { 'icon-512.png': 512, 'icon-192.png': 192, 'apple-touch-icon.png': 180 };
 const BOARD = 1024; // board size in CSS pixels
-const ZOOM = 1.6; // icon width as a multiple of the red car's width
+const ZOOM = 1.45; // icon width as a multiple of the red car's width
 
 // Just the board, large, with nothing around it.
 const STYLE = `
