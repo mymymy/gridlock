@@ -10,6 +10,11 @@
 (function () {
   'use strict';
 
+  // Trial look: ?wood for stained wooden blocks, ?wood=natural for bare wood
+  // with only the red block painted.
+  const look = new URLSearchParams(location.search).get('wood');
+  if (look !== null) document.documentElement.classList.add('wood', ...(look === 'natural' ? ['natural'] : []));
+
   const dark = (a) => `fill="#000" fill-opacity="${a}"`;
   const light = (a) => `fill="#fff" fill-opacity="${a}"`;
   const line = (x1, y1, x2, y2, a, w) =>
@@ -107,10 +112,60 @@
     `<rect x="294" y="30" width="3" height="40" rx="1.5" ${dark(0.3)}/>`,
   ].join('');
 
+  // Plain wooden block, L x 100 units: long grain lines that drift and
+  // bunch around the odd knot, and a chamfer round the top edge. The same
+  // vehicle letter always gets the same grain.
+  let clipCount = 0;
+  function block(L, seed) {
+    let a = seed * 2654435761 >>> 0;
+    const rand = () => {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = Math.imul(a ^ (a >>> 15), a | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+    const id = 'grain' + ++clipCount;
+    const knot = rand() < 0.6 ? { x: 30 + rand() * (L - 60), y: 25 + rand() * 50, r: 5 + rand() * 4 } : null;
+    const parts = [];
+    for (let y = 4 + rand() * 6; y < 100; y += 7 + rand() * 7) {
+      const amp = 1.5 + rand() * 3, freq = (0.6 + rand()) / L * Math.PI * 2, phase = rand() * 6.3;
+      let d = '';
+      for (let x = -4; x <= L + 4; x += 8) {
+        let yy = y + Math.sin(x * freq + phase) * amp;
+        // Lines swerve round the knot.
+        if (knot) {
+          const dx = (x - knot.x) / (knot.r * 3.2), dy = yy - knot.y;
+          yy += Math.sign(dy || 1) * knot.r * 1.6 * Math.exp(-dx * dx) * Math.exp(-(dy * dy) / 500);
+        }
+        d += (d ? ' L' : 'M') + x + ',' + yy.toFixed(1);
+      }
+      const shade = rand() < 0.7;
+      parts.push(`<path d="${d}" fill="none" stroke="${shade ? '#000' : '#fff'}" stroke-opacity="${shade ? (0.08 + rand() * 0.1).toFixed(2) : 0.12}" stroke-width="${(1 + rand() * 2.2).toFixed(1)}"/>`);
+    }
+    if (knot) {
+      parts.push(
+        `<ellipse cx="${knot.x.toFixed(1)}" cy="${knot.y.toFixed(1)}" rx="${(knot.r * 1.6).toFixed(1)}" ry="${knot.r.toFixed(1)}" fill="none" stroke="#000" stroke-opacity="0.14" stroke-width="1.5"/>`,
+        `<ellipse cx="${knot.x.toFixed(1)}" cy="${knot.y.toFixed(1)}" rx="${(knot.r * 0.8).toFixed(1)}" ry="${(knot.r * 0.55).toFixed(1)}" ${dark(0.28)}/>`
+      );
+    }
+    return [
+      `<clipPath id="${id}"><rect width="${L}" height="100" rx="6"/></clipPath>`,
+      `<g clip-path="url(#${id})">${parts.join('')}</g>`,
+      // Chamfer: lit along the top and back, shaded along the bottom and front.
+      `<polygon points="0,0 ${L},0 ${L - 6},6 6,6" ${light(0.22)}/>`,
+      `<polygon points="0,0 6,6 6,94 0,100" ${light(0.12)}/>`,
+      `<polygon points="0,100 6,94 ${L - 6},94 ${L},100" ${dark(0.22)}/>`,
+      `<polygon points="${L},0 ${L},100 ${L - 6},94 ${L - 6},6" ${dark(0.14)}/>`,
+    ].join('');
+  }
+
   // ox, oy: roof shift in the vehicle's own units (100 = one cell), facing right.
   window.vehicleArt = function (v, ox, oy) {
     const len = v.len * 100;
-    const art = v.len === 3 ? truck(ox || 0, oy || 0) : car(ox || 0, oy || 0);
+    const wood = document.documentElement.classList.contains('wood');
+    const art = wood
+      ? block(len, v.id.charCodeAt(0))
+      : v.len === 3 ? truck(ox || 0, oy || 0) : car(ox || 0, oy || 0);
     const box = v.horiz ? `0 0 ${len} 100` : `0 0 100 ${len}`;
     const inner = v.horiz ? art : `<g transform="translate(100 0) rotate(90)">${art}</g>`;
     return `<svg class="art" viewBox="${box}" preserveAspectRatio="none" aria-hidden="true">${inner}</svg>`;
