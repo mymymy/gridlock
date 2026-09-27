@@ -4,7 +4,7 @@ A browser sliding-block puzzle. Slide cars and trucks along their lanes until th
 
 ## Play
 
-Play online at https://mymymy.github.io/rush-hour/ or open `index.html` in a browser. There’s no build step and no dependencies.
+Play online at https://mymymy.github.io/gridlock/ or open `index.html` in a browser. There’s no build step and no dependencies.
 
 - 50 levels: ten each at Beginner, Intermediate, Advanced, Expert and Grand Master.
 - Drag a vehicle to slide it. Keyboard: Tab to a vehicle, then use the arrow keys.
