@@ -14,8 +14,11 @@
   // mottled, dimpled surface; ?wood a faint wood grain (?wood=natural leaves
   // the wood bare, with only the red block painted).
   const params = new URLSearchParams(location.search);
-  const texture = params.has('grain') ? 'grain' : params.has('wood') ? 'wood' : null;
+  // ?flat drops the lighting and rounded corners, alone or with a texture.
+  const flat = params.has('flat');
+  const texture = params.has('grain') ? 'grain' : params.has('wood') ? 'wood' : flat ? 'plain' : null;
   if (texture) document.documentElement.classList.add('blocks', texture);
+  if (flat) document.documentElement.classList.add('flat');
   if (texture === 'wood' && params.get('wood') === 'natural') document.documentElement.classList.add('natural');
 
   const dark = (a) => `fill="#000" fill-opacity="${a}"`;
@@ -173,7 +176,8 @@
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
     const id = 'block' + ++blockCount;
-    const surface = texture === 'wood' ? woodGrain(L, rand) : mottle(L, seed, id);
+    const surface = texture === 'wood' ? woodGrain(L, rand) : texture === 'grain' ? mottle(L, seed, id) : '';
+    if (flat) return surface;
     return [
       `<clipPath id="${id}"><rect width="${L}" height="100" rx="6"/></clipPath>`,
       `<g clip-path="url(#${id})">${surface}</g>`,
