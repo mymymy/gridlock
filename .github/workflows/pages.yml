@@ -31,7 +31,8 @@ jobs:
           mkdir _site
           cp -r index.html style.css js fonts icons manifest.webmanifest sw.js _site/
           # Stamp asset links with the commit so browsers fetch fresh copies after each deploy.
-          sed -i -E 's#(href="style\.css|src="js/[a-z]+\.js)"#\1?v=${{ github.sha }}"#g' _site/index.html
+          sed -i -E 's#((href|src)="(style\.css|js/[a-z]+\.js|icons/[a-z0-9-]+\.png|manifest\.webmanifest))"#\1?v=${{ github.sha }}"#g' _site/index.html
+          sed -i -E 's#("src": "icons/[a-z0-9-]+\.png)"#\1?v=${{ github.sha }}"#g' _site/manifest.webmanifest
           # A new service worker version per deploy, so installed copies update.
           sed -i "s/const VERSION = 'dev';/const VERSION = '${{ github.sha }}';/" _site/sw.js
       - uses: actions/configure-pages@v5
