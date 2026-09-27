@@ -10,10 +10,13 @@
 (function () {
   'use strict';
 
-  // Trial look: ?wood for stained wooden blocks, ?wood=natural for bare wood
-  // with only the red block painted.
-  const look = new URLSearchParams(location.search).get('wood');
-  if (look !== null) document.documentElement.classList.add('wood', ...(look === 'natural' ? ['natural'] : []));
+  // Trial looks: plain blocks instead of vehicles. ?grain gives a fine
+  // mottled, dimpled surface; ?wood a faint wood grain (?wood=natural leaves
+  // the wood bare, with only the red block painted).
+  const params = new URLSearchParams(location.search);
+  const texture = params.has('grain') ? 'grain' : params.has('wood') ? 'wood' : null;
+  if (texture) document.documentElement.classList.add('blocks', texture);
+  if (texture === 'wood' && params.get('wood') === 'natural') document.documentElement.classList.add('natural');
 
   const dark = (a) => `fill="#000" fill-opacity="${a}"`;
   const light = (a) => `fill="#fff" fill-opacity="${a}"`;
@@ -112,19 +115,9 @@
     `<rect x="294" y="30" width="3" height="40" rx="1.5" ${dark(0.3)}/>`,
   ].join('');
 
-  // Plain wooden block, L x 100 units: long grain lines that drift and
-  // bunch around the odd knot, and a chamfer round the top edge. The same
-  // vehicle letter always gets the same grain.
-  let clipCount = 0;
-  function block(L, seed) {
-    let a = seed * 2654435761 >>> 0;
-    const rand = () => {
-      a = (a + 0x6d2b79f5) >>> 0;
-      let t = Math.imul(a ^ (a >>> 15), a | 1);
-      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-    };
-    const id = 'grain' + ++clipCount;
+  // Faint wood grain for an L x 100 block: long lines that drift and bunch
+  // around the odd knot.
+  function woodGrain(L, rand) {
     const knot = rand() < 0.3 ? { x: 30 + rand() * (L - 60), y: 25 + rand() * 50, r: 5 + rand() * 4 } : null;
     const parts = [];
     for (let y = 6 + rand() * 8; y < 100; y += 10 + rand() * 9) {
@@ -148,9 +141,42 @@
         `<ellipse cx="${knot.x.toFixed(1)}" cy="${knot.y.toFixed(1)}" rx="${(knot.r * 0.8).toFixed(1)}" ry="${(knot.r * 0.55).toFixed(1)}" ${dark(0.1)}/>`
       );
     }
+    return parts.join('');
+  }
+
+  // Mottled, dimpled surface, like rough paper or moulded plastic: fine
+  // speckle for the tooth over a few soft blotches.
+  function mottle(L, seed, id) {
+    const noise = (freq, octaves, alpha) =>
+      `<feTurbulence type="fractalNoise" baseFrequency="${freq}" numOctaves="${octaves}" seed="${seed}"/>` +
+      `<feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  ${alpha}"/>`;
+    return [
+      // Dark and light speckles from opposite ends of the same noise.
+      `<filter id="${id}d" x="0" y="0" width="100%" height="100%">${noise(0.9, 2, '2.2 0 0 0 -1.25')}</filter>`,
+      `<filter id="${id}l" x="0" y="0" width="100%" height="100%">${noise(0.9, 2, '-2.2 0 0 0 0.95')}</filter>`,
+      `<filter id="${id}m" x="0" y="0" width="100%" height="100%">${noise(0.035, 2, '0 1.4 0 0 -0.62')}</filter>`,
+      `<rect width="${L}" height="100" filter="url(#${id}m)" opacity="0.12"/>`,
+      `<rect width="${L}" height="100" filter="url(#${id}d)" opacity="0.28"/>`,
+      `<rect width="${L}" height="100" fill="#fff" filter="url(#${id}l)" opacity="0.3"/>`,
+    ].join('');
+  }
+
+  // Plain block, L x 100 units, with a chamfer round the top edge. The same
+  // vehicle letter always gets the same texture.
+  let blockCount = 0;
+  function block(L, seed, texture) {
+    let a = seed * 2654435761 >>> 0;
+    const rand = () => {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = Math.imul(a ^ (a >>> 15), a | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+    const id = 'block' + ++blockCount;
+    const surface = texture === 'wood' ? woodGrain(L, rand) : mottle(L, seed, id);
     return [
       `<clipPath id="${id}"><rect width="${L}" height="100" rx="6"/></clipPath>`,
-      `<g clip-path="url(#${id})">${parts.join('')}</g>`,
+      `<g clip-path="url(#${id})">${surface}</g>`,
       // Chamfer: lit along the top and back, shaded along the bottom and front.
       `<polygon points="0,0 ${L},0 ${L - 6},6 6,6" ${light(0.22)}/>`,
       `<polygon points="0,0 6,6 6,94 0,100" ${light(0.12)}/>`,
@@ -162,9 +188,8 @@
   // ox, oy: roof shift in the vehicle's own units (100 = one cell), facing right.
   window.vehicleArt = function (v, ox, oy) {
     const len = v.len * 100;
-    const wood = document.documentElement.classList.contains('wood');
-    const art = wood
-      ? block(len, v.id.charCodeAt(0))
+    const art = texture
+      ? block(len, v.id.charCodeAt(0), texture)
       : v.len === 3 ? truck(ox || 0, oy || 0) : car(ox || 0, oy || 0);
     const box = v.horiz ? `0 0 ${len} 100` : `0 0 100 ${len}`;
     const inner = v.horiz ? art : `<g transform="translate(100 0) rotate(90)">${art}</g>`;
