@@ -17,6 +17,8 @@ const STYLE = `
   .app > :not(.play), .play > :not(.board-wrap), .win { display: none !important; }
   .board { position: fixed; inset: 0; width: ${BOARD}px; height: ${BOARD}px; border-radius: 0; box-shadow: none; }
   .body { border-radius: 16px; }
+  /* Punchier colours, to hold their own among other apps' icons. */
+  .vehicle { filter: saturate(1.5) brightness(1.1) contrast(1.05); }
   /* Grid lines bold enough to read at icon size, centred on the cell edges. */
   .grid {
     background-image:
