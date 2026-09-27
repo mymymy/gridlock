@@ -320,6 +320,26 @@
     el.classList.add('animate');
   }
 
+  // Keep the success headline waving while the result panel is open: once
+  // every letter has sunk, pause, then go again.
+  const WAVE_PAUSE = 1200;
+  let sunk = 0;
+  let waveTimer = null;
+  $('win-title').addEventListener('animationend', (e) => {
+    const el = e.currentTarget;
+    if (e.animationName !== 'letter-sink' || ++sunk < el.children.length) return;
+    sunk = 0;
+    clearTimeout(waveTimer);
+    waveTimer = setTimeout(() => {
+      if (!$('win').hidden) replay(el);
+    }, WAVE_PAUSE);
+  });
+  function startWinWave() {
+    clearTimeout(waveTimer);
+    sunk = 0;
+    replay($('win-title'));
+  }
+
   // Wave letters: the face takes the current level's colour, so the
   // extrusions cycle through the other four level colours.
   function waveColours() {
@@ -373,7 +393,7 @@
 
     setTimeout(() => {
       $('win').hidden = false;
-      replay($('win-title'));
+      startWinWave();
       $('win-next').focus({ preventScroll: true });
     }, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 560);
     updateHud();
