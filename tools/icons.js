@@ -17,6 +17,13 @@ const STYLE = `
   .app > :not(.play), .play > :not(.board-wrap), .win { display: none !important; }
   .board { position: fixed; inset: 0; width: ${BOARD}px; height: ${BOARD}px; border-radius: 0; box-shadow: none; }
   .body { border-radius: 16px; }
+  /* Grid lines bold enough to read at icon size, centred on the cell edges. */
+  .grid {
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.22) 5px, transparent 5px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.22) 5px, transparent 5px);
+    background-position: -2.5px -2.5px;
+  }
 `;
 
 async function open(browser, scale) {
