@@ -348,26 +348,6 @@ button { font: inherit; color: inherit; }
 }
 .vehicle.red { --c: var(--red); }
 
-/* Trial block looks (?grain, ?wood, ?wood=natural): plain blocks in bright
-   colours, with the texture drawn in vehicles.js over the top. Bolder
-   stand-ins for the duller vehicle colours. */
-.blocks {
-  --v7: #f2b90f; --v8: #6cc04a; --v9: #5a55e6;
-  --v10: #f2622e; --v11: #12b3a6; --v12: #d24bb4;
-}
-.blocks .body {
-  --wood: var(--c);
-  --side: color-mix(in srgb, var(--wood) 55%, #000);
-  border-radius: 6px;
-  background: linear-gradient(150deg, color-mix(in srgb, var(--wood) 84%, #fff) 0%, var(--wood) 45%, color-mix(in srgb, var(--wood) 90%, #000) 100%);
-}
-.flat .body { border-radius: 0; background: var(--wood); }
-.wood .body { --wood: color-mix(in srgb, var(--c) 90%, #e0b57e); }
-.wood .vehicle.red .body { --wood: var(--c); }
-.wood.natural .vehicle:not(.red) .body { --wood: #d3a46a; }
-.wood.natural .vehicle:not(.red):nth-child(3n) .body { --wood: #c48f58; }
-.wood.natural .vehicle:not(.red):nth-child(4n+1) .body { --wood: #ddb683; }
-
 .vehicle.hint .body {
   outline: 4px solid var(--marking);
   outline-offset: 2px;
