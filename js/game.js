@@ -45,8 +45,8 @@
     { name: 'Intermediate', cls: 't2', upTo: 14 },
     { name: 'Advanced', cls: 't3', upTo: 21 },
     { name: 'Expert', cls: 't4', upTo: 34 },
-    { name: 'Grand Master', cls: 't5', upTo: 41 },
-    { name: 'Legend', cls: 't6', upTo: Infinity },
+    { name: 'Master', cls: 't5', upTo: 41 },
+    { name: 'Grand Master', cls: 't6', upTo: Infinity },
   ];
   const tier = (minMoves) => TIERS.find((t) => minMoves <= t.upTo);
 
