@@ -351,12 +351,12 @@ button { font: inherit; color: inherit; }
 /* Trial wooden-block look (?wood, ?wood=natural): the colour is a stain over
    a wood tone, so the grain drawn in vehicles.js shows through. */
 .wood .body {
-  --wood: color-mix(in srgb, var(--c) 62%, #c8955a);
+  --wood: color-mix(in srgb, var(--c) 90%, #e0b57e);
   --side: color-mix(in srgb, var(--wood) 55%, #000);
   border-radius: 6px;
   background: linear-gradient(150deg, color-mix(in srgb, var(--wood) 84%, #fff) 0%, var(--wood) 45%, color-mix(in srgb, var(--wood) 90%, #000) 100%);
 }
-.wood .vehicle.red .body { --wood: color-mix(in srgb, var(--c) 85%, #c8955a); }
+.wood .vehicle.red .body { --wood: var(--c); }
 .wood.natural .vehicle:not(.red) .body { --wood: #d3a46a; }
 .wood.natural .vehicle:not(.red):nth-child(3n) .body { --wood: #c48f58; }
 .wood.natural .vehicle:not(.red):nth-child(4n+1) .body { --wood: #ddb683; }

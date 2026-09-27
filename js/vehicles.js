@@ -125,10 +125,10 @@
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
     const id = 'grain' + ++clipCount;
-    const knot = rand() < 0.6 ? { x: 30 + rand() * (L - 60), y: 25 + rand() * 50, r: 5 + rand() * 4 } : null;
+    const knot = rand() < 0.3 ? { x: 30 + rand() * (L - 60), y: 25 + rand() * 50, r: 5 + rand() * 4 } : null;
     const parts = [];
-    for (let y = 4 + rand() * 6; y < 100; y += 7 + rand() * 7) {
-      const amp = 1.5 + rand() * 3, freq = (0.6 + rand()) / L * Math.PI * 2, phase = rand() * 6.3;
+    for (let y = 6 + rand() * 8; y < 100; y += 10 + rand() * 9) {
+      const amp = 0.8 + rand() * 1.8, freq = (0.6 + rand()) / L * Math.PI * 2, phase = rand() * 6.3;
       let d = '';
       for (let x = -4; x <= L + 4; x += 8) {
         let yy = y + Math.sin(x * freq + phase) * amp;
@@ -140,12 +140,12 @@
         d += (d ? ' L' : 'M') + x + ',' + yy.toFixed(1);
       }
       const shade = rand() < 0.7;
-      parts.push(`<path d="${d}" fill="none" stroke="${shade ? '#000' : '#fff'}" stroke-opacity="${shade ? (0.08 + rand() * 0.1).toFixed(2) : 0.12}" stroke-width="${(1 + rand() * 2.2).toFixed(1)}"/>`);
+      parts.push(`<path d="${d}" fill="none" stroke="${shade ? '#000' : '#fff'}" stroke-opacity="${shade ? (0.035 + rand() * 0.035).toFixed(3) : 0.06}" stroke-width="${(0.8 + rand() * 1.4).toFixed(1)}"/>`);
     }
     if (knot) {
       parts.push(
-        `<ellipse cx="${knot.x.toFixed(1)}" cy="${knot.y.toFixed(1)}" rx="${(knot.r * 1.6).toFixed(1)}" ry="${knot.r.toFixed(1)}" fill="none" stroke="#000" stroke-opacity="0.14" stroke-width="1.5"/>`,
-        `<ellipse cx="${knot.x.toFixed(1)}" cy="${knot.y.toFixed(1)}" rx="${(knot.r * 0.8).toFixed(1)}" ry="${(knot.r * 0.55).toFixed(1)}" ${dark(0.28)}/>`
+        `<ellipse cx="${knot.x.toFixed(1)}" cy="${knot.y.toFixed(1)}" rx="${(knot.r * 1.6).toFixed(1)}" ry="${knot.r.toFixed(1)}" fill="none" stroke="#000" stroke-opacity="0.06" stroke-width="1.2"/>`,
+        `<ellipse cx="${knot.x.toFixed(1)}" cy="${knot.y.toFixed(1)}" rx="${(knot.r * 0.8).toFixed(1)}" ry="${(knot.r * 0.55).toFixed(1)}" ${dark(0.1)}/>`
       );
     }
     return [
