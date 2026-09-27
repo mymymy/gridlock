@@ -20,7 +20,7 @@
 // as "moves positions climb board", which tools/generate.js reads when it
 // fills the hardest tier.
 //
-// Usage: node tools/search.js [seconds] [seed]
+// Usage: node tools/search.js [seconds] [seed] [fewest moves to keep, default 42]
 // One process on one core; stop it at any time with Ctrl-C (or
 // pkill -f tools/search.js). Boards found so far are already saved.
 'use strict';
@@ -30,7 +30,7 @@ const path = require('path');
 const Solver = require('../js/solver.js');
 
 const { SIZE, EXIT_ROW, GOAL_COL } = Solver;
-const MIN_KEEP = 42;
+let MIN_KEEP = 42; // lower it with the third argument to collect easier puzzles too
 const MAX_POSITIONS = 400000; // layouts with more are too open to be hard
 const MAX_LEVEL_STEPS = 3; // steps along a plateau before restarting
 const OUT_FILE = path.join(__dirname, 'hard-boards.txt');
@@ -291,6 +291,7 @@ function neighbours(lanes) {
 function main() {
   const seconds = Number(process.argv[2] || 60);
   const seed = Number(process.argv[3] || Date.now() % 100000);
+  if (process.argv[4]) MIN_KEEP = Number(process.argv[4]);
   const rand = rng(seed);
   const started = Date.now();
   const elapsed = () => (Date.now() - started) / 1000;

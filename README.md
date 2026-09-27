@@ -6,7 +6,7 @@ A browser sliding-block puzzle. Slide cars and trucks along their lanes until th
 
 Play online at https://mymymy.github.io/gridlock/ or open `index.html` in a browser. There’s no build step and no dependencies.
 
-- 60 levels: ten each at Beginner, Intermediate, Advanced, Expert, Master and Grand Master.
+- 90 levels: fifteen each at Beginner, Intermediate, Advanced, Expert, Master and Grand Master.
 - Drag a vehicle to slide it. Keyboard: Tab to a vehicle, then use the arrow keys.
 - Sliding the same vehicle twice in a row counts as one move.
 - **Hint** shows the next move on a shortest route from where you are.
@@ -24,8 +24,8 @@ Play online at https://mymymy.github.io/gridlock/ or open `index.html` in a brow
 | `js/levels.js` | The levels, each with the fewest moves that solve it. Generated. |
 | `js/vehicles.js` | Top-down car and truck artwork, drawn as single-colour moulded plastic. |
 | `js/game.js` | Rendering, drag and keyboard input, move counting, hints, progress. |
-| `tools/generate.js` | Makes `js/levels.js`. Explores every position reachable from a layout and picks one at a chosen distance from a solution. Easy levels come from random layouts; hard ones from hill climbing (add, remove or move a vehicle, keep the change if the puzzle gets no easier). Grand Master levels come from `tools/hard-boards.txt`. Takes up to 10 minutes. |
-| `tools/search.js` | A longer hunt for very hard boards. Scores each layout by its hardest puzzle over every position the vehicles can take, climbs by adding and removing vehicles, and saves every puzzle of 42 moves or more to `tools/hard-boards.txt`. Runs on one core for as long as you ask. |
+| `tools/generate.js` | Makes `js/levels.js`. Explores every position reachable from a layout and picks one at a chosen distance from a solution. Easy levels come from random layouts; hard ones from hill climbing (add, remove or move a vehicle, keep the change if the puzzle gets no easier). Expert, Master and Grand Master levels mostly come from `tools/hard-boards.txt`. Takes up to 10 minutes. |
+| `tools/search.js` | A longer hunt for very hard boards. Scores each layout by its hardest puzzle over every position the vehicles can take, climbs by adding and removing vehicles, and saves every puzzle of 42 moves or more (or a lower threshold you give it) to `tools/hard-boards.txt`. Runs on one core for as long as you ask. |
 | `sw.js`, `manifest.webmanifest`, `icons/` | Offline support and home-screen install. The deploy stamps each release into the service worker so installed copies update. `tools/icons.js` renders the icons: a close-up of level 1’s red car. |
 | `tools/bundle.js` | Inlines everything into a single `dist/index.html`. |
 
@@ -46,6 +46,6 @@ npm run bundle        # write dist/index.html
 
 ## Next steps
 
-- More Grand Master levels near the top. Every 6 × 6 board has been checked and the hardest needs 51 moves; level 60 is that board, from [Michael Fogleman’s Rush Hour database](https://www.michaelfogleman.com/rush/) ([code](https://github.com/fogleman/rush), MIT licence). Our own search has reached 49.
+- More Grand Master levels near the top. Every 6 × 6 board has been checked and the hardest needs 51 moves; level 90 is that board, from [Michael Fogleman’s Rush Hour database](https://www.michaelfogleman.com/rush/) ([code](https://github.com/fogleman/rush), MIT licence). Our own search has reached 49.
 - Walls (fixed blocks). With one wall the hardest board needs 60 moves.
 - Hand-picked difficulty tiers and a larger set of levels.

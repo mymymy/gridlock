@@ -49,9 +49,9 @@ alongside and read it rather than guessing.
 
 ## Levels (from `js/levels.js`)
 
-60 levels, each `{ board, minMoves }`, ten per tier. Ship them as a bundled
+90 levels, each `{ board, minMoves }`, fifteen per tier. Ship them as a bundled
 JSON file generated from `js/levels.js` (a small script is fine), and test
-that every one solves in exactly `minMoves`. Level 60 is the hardest possible
+that every one solves in exactly `minMoves`. Level 90 is the hardest possible
 6×6 board (51 moves), from Michael Fogleman's database
 (github.com/fogleman/rush, MIT licence): keep the credit in the app's
 acknowledgements.
