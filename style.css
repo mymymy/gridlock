@@ -46,10 +46,10 @@
   --tarmac-edge: #262a30;
   --cell-line: rgba(255, 255, 255, 0.11);
   --marking: #f0c02e;
-  /* Difficulty colours: Beginner to Grand Master. */
-  --tier1: #2e9f78; --tier2: #e3a52a; --tier3: #3b7bd6; --tier4: #d6312a; --tier5: #8a68cf;
+  /* Difficulty colours: Beginner to Legend. */
+  --tier1: #2e9f78; --tier2: #e3a52a; --tier3: #3b7bd6; --tier4: #d6312a; --tier5: #8a68cf; --tier6: #e0368a;
   /* Level colours as display text; green and amber deepen on light grounds (3.2:1+). */
-  --tier1-ink: #298f6b; --tier2-ink: #a3761e; --tier3-ink: var(--tier3); --tier4-ink: var(--tier4); --tier5-ink: var(--tier5);
+  --tier1-ink: #298f6b; --tier2-ink: #a3761e; --tier3-ink: var(--tier3); --tier4-ink: var(--tier4); --tier5-ink: var(--tier5); --tier6-ink: var(--tier6);
   --marking-ink: #a87400; /* amber for large display text on light grounds (3.3:1) */
   --red: #d6312a;
   --focus: #1f6fd1;
@@ -511,6 +511,7 @@ button { font: inherit; color: inherit; }
 .t3 { --tier-c: var(--tier3); }
 .t4 { --tier-c: var(--tier4); }
 .t5 { --tier-c: var(--tier5); }
+.t6 { --tier-c: var(--tier6); }
 
 /* Wide cut of Special Gothic for subheadings and labels; body text stays regular width. */
 .card-label,

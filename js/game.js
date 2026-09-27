@@ -45,7 +45,8 @@
     { name: 'Intermediate', cls: 't2', upTo: 14 },
     { name: 'Advanced', cls: 't3', upTo: 21 },
     { name: 'Expert', cls: 't4', upTo: 34 },
-    { name: 'Grand Master', cls: 't5', upTo: Infinity },
+    { name: 'Grand Master', cls: 't5', upTo: 41 },
+    { name: 'Legend', cls: 't6', upTo: Infinity },
   ];
   const tier = (minMoves) => TIERS.find((t) => minMoves <= t.upTo);
 
@@ -341,10 +342,10 @@
   }
 
   // Wave letters: the face takes the current level's colour, so the
-  // extrusions cycle through the other four level colours.
+  // extrusions cycle through the other level colours.
   function waveColours() {
     const current = tier(LEVELS[level].minMoves).cls.slice(1);
-    return ['1', '2', '3', '4', '5'].filter((k) => k !== current).map((k) => `var(--tier${k})`);
+    return TIERS.map((t) => t.cls.slice(1)).filter((k) => k !== current).map((k) => `var(--tier${k})`);
   }
   function paintWave(el) {
     const colours = waveColours();
@@ -444,7 +445,7 @@
   // Moving to a new level (from the list or the result panel): a panel in the
   // level's colour wipes up the screen (the way the page scrolls back). While
   // it covers the page the level loads and the page returns to the board;
-  // then it lifts off the top with echoes in the other four level colours
+  // then it lifts off the top with echoes in the other level colours
   // trailing behind it.
   let wiping = false;
   function goToLevel(n) {
@@ -460,7 +461,7 @@
     }
     wiping = true;
     const main = tier(LEVELS[n].minMoves).cls.slice(1);
-    const echoes = ['1', '2', '3', '4', '5'].filter((k) => k !== main);
+    const echoes = TIERS.map((t) => t.cls.slice(1)).filter((k) => k !== main);
     // Echoes first so the main colour paints on top of them.
     const panels = [...echoes, main].map((k) => {
       const el = document.createElement('div');

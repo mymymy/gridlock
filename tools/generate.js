@@ -10,6 +10,10 @@
 // targets come from hill climbing: repeatedly add, remove or move a vehicle,
 // keeping the change whenever the hardest reachable position gets no easier.
 //
+// The hardest tier needs more search than this script can do in its time
+// budget, so those levels come from tools/hard-boards.txt, which
+// tools/search.js fills over longer runs.
+//
 // Usage: node tools/generate.js [seed] [--keep]
 //   --keep  keep levels already in js/levels.js and only search for missing ones
 'use strict';
@@ -17,6 +21,7 @@
 const fs = require('fs');
 const path = require('path');
 const Solver = require('../js/solver.js');
+const { shape, difference } = require('./search.js');
 
 // Ten levels per difficulty tier. Tier limits match tier() in js/game.js.
 const TARGETS = [
@@ -24,7 +29,8 @@ const TARGETS = [
   8, 9, 9, 10, 11, 11, 12, 13, 13, 14, // Intermediate (8-14)
   15, 16, 16, 17, 18, 18, 19, 20, 20, 21, // Advanced (15-21)
   22, 23, 25, 26, 27, 29, 30, 31, 33, 34, // Expert (22-34)
-  35, 35, 35, 36, 36, 37, 38, 39, 40, 41, // Grand Master (35+)
+  35, 35, 35, 36, 36, 37, 38, 39, 40, 41, // Grand Master (35-41)
+  42, 42, 43, 44, 45, 46, 46, 46, 47, 49, // Legend (42+), from tools/hard-boards.txt
 ];
 const RANDOM_BUDGET_MS = 20000;
 const TIME_BUDGET_MS = 600000;
@@ -32,6 +38,7 @@ const RESTART_AFTER = 400; // hill-climbing steps without improvement
 const PER_LINEAGE = 2; // levels taken from one climb before starting afresh
 const MAX_COMPONENT = 50000;
 const LEVELS_FILE = path.join(__dirname, '..', 'js', 'levels.js');
+const HARD_FILE = path.join(__dirname, 'hard-boards.txt');
 
 // Small seeded PRNG (mulberry32) so a seed always gives the same levels.
 function rng(seed) {
@@ -219,6 +226,33 @@ function main() {
       found.get(Number(moves)).push(board);
     }
     console.log(`Kept ${used.size} levels; searching for ${open.length}`);
+  }
+
+  // Very hard boards from tools/search.js. Many come from the same few
+  // climbs and look alike, so for each target take the one least like the
+  // hard boards already chosen.
+  if (fs.existsSync(HARD_FILE)) {
+    const pool = fs
+      .readFileSync(HARD_FILE, 'utf8')
+      .split('\n')
+      .map((line) => line.trim().split(/\s+/))
+      .filter((f) => f.length === 4)
+      .map(([moves, , , board]) => ({ moves: Number(moves), board }));
+    const chosen = [];
+    let added = 0;
+    for (const target of open.slice().sort((a, b) => b - a)) {
+      const options = pool.filter((p) => p.moves === target && !used.has(p.board));
+      if (!options.length) continue;
+      const score = (p) => Math.min(99, ...chosen.map((c) => difference(shape(p.board), c)));
+      const pick = options.reduce((a, b) => (score(b) > score(a) ? b : a));
+      chosen.push(shape(pick.board));
+      used.add(pick.board);
+      if (!found.has(target)) found.set(target, []);
+      found.get(target).push(pick.board);
+      open.splice(open.indexOf(target), 1);
+      added++;
+    }
+    console.log(`Took ${added} levels from ${path.relative(process.cwd(), HARD_FILE)}; searching for ${open.length}`);
   }
 
   // Phase 1: random layouts. Each fills the hardest target it can still

@@ -6,6 +6,7 @@
   "scripts": {
     "test": "node --test test/*.test.js",
     "generate": "node tools/generate.js",
+    "search": "node tools/search.js",
     "bundle": "node tools/bundle.js"
   }
 }
