@@ -12,6 +12,9 @@ Play online at https://mymymy.github.io/gridlock/ or open `index.html` in a brow
 - **Hint** shows the next move on a shortest route from where you are.
 - **Undo** (or Ctrl/Cmd+Z) and **Reset** work as you’d expect.
 - Your best score for each level is saved in this browser. Solves that used a hint don’t count towards your best.
+- Install it as an app: on iPhone, Share → Add to Home Screen; on Android, Install app. It works offline once opened.
+- Haptics: a tap when a vehicle settles, a nudge when you push into something, a buzz when you win. Android uses the Vibration API; iPhones (iOS 18+) get a light tap from a hidden switch control, as Safari has no Vibration API.
+- Screen readers: each vehicle is a slider named by colour and type (‘blue car, across’) that reads out where it is (‘row 1, columns B to C’). Arrow keys or swipes up and down slide it; blocked moves, hints, undos and wins are announced.
 
 ## How it works
 
@@ -23,6 +26,7 @@ Play online at https://mymymy.github.io/gridlock/ or open `index.html` in a brow
 | `js/game.js` | Rendering, drag and keyboard input, move counting, hints, progress. |
 | `tools/generate.js` | Makes `js/levels.js`. Explores every position reachable from a layout and picks one at a chosen distance from a solution. Easy levels come from random layouts; hard ones from hill climbing (add, remove or move a vehicle, keep the change if the puzzle gets no easier). Grand Master levels come from `tools/hard-boards.txt`. Takes up to 10 minutes. |
 | `tools/search.js` | A longer hunt for very hard boards. Scores each layout by its hardest puzzle over every position the vehicles can take, climbs by adding and removing vehicles, and saves every puzzle of 42 moves or more to `tools/hard-boards.txt`. Runs on one core for as long as you ask. |
+| `sw.js`, `manifest.webmanifest`, `icons/` | Offline support and home-screen install. The deploy stamps each release into the service worker so installed copies update. |
 | `tools/bundle.js` | Inlines everything into a single `dist/index.html`. |
 
 A board is a 36-character string read row by row: `.` is empty, `A` is the red car and other letters are vehicles.

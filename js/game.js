@@ -68,31 +68,70 @@
     updateHud();
     renderCards();
     setHelp('Drag a vehicle along its lane. Get the red car to the exit.');
+    $('board').setAttribute(
+      'aria-label',
+      `Level ${level + 1}, ${tier(LEVELS[level].minMoves).name}. ${vehicles.length} vehicles. ` +
+        'Columns A to F run left to right and rows 1 to 6 top to bottom. The exit is on the right of row 3. ' +
+        'Tab to a vehicle to hear where it is, then use the arrow keys, or swipe up and down, to slide it.'
+    );
   }
 
+  // Each vehicle holds an invisible slider over its whole body. Screen
+  // readers treat it as something to slide (arrow keys, or swipe up and
+  // down on a phone) and read out where the vehicle is; drags go to the
+  // vehicle itself.
   function buildVehicles() {
     gridEl.textContent = '';
+    const names = vehicleNames();
     els = vehicles.map((v, i) => {
       const el = document.createElement('div');
       el.className = 'vehicle ' + (v.horiz ? 'h' : 'v') + (v.len === 3 ? ' truck' : '') + (i === 0 ? ' red' : '');
-      el.tabIndex = 0;
-      el.setAttribute('role', 'button');
-      el.setAttribute('aria-label', vehicleLabel(i));
       if (i > 0) el.style.setProperty('--c', `var(--v${((i - 1) % 12) + 1})`);
-      el.innerHTML = '<div class="body"></div>';
+      el.innerHTML = '<div class="body"></div><input class="lane" type="range" step="1">';
+      const lane = el.lastChild;
+      lane.min = 0;
+      lane.max = Solver.SIZE - v.len;
+      lane.setAttribute('aria-label', `${names[i]}, ${v.horiz ? 'across' : 'up and down'}`);
+      lane.addEventListener('input', () => onSlide(i));
+      lane.addEventListener('keydown', (e) => onLaneKey(e, i));
       el.addEventListener('pointerdown', (e) => onPointerDown(e, i));
-      el.addEventListener('keydown', (e) => onKey(e, i));
       gridEl.appendChild(el);
       place(i, pos[i], el);
       return el;
     });
+    vehicles.forEach((v, i) => sync(i));
   }
 
-  function vehicleLabel(i) {
+  // Spoken names: 'red car', then each vehicle's colour, numbered when a
+  // colour comes round again.
+  const COLOUR_NAMES = ['blue', 'green', 'orange', 'purple', 'pink', 'teal', 'tan', 'olive', 'indigo', 'yellow', 'sage', 'plum'];
+  function vehicleNames() {
+    const seen = {};
+    return vehicles.map((v, i) => {
+      const name = i === 0 ? 'red car' : `${COLOUR_NAMES[(i - 1) % 12]} ${v.len === 3 ? 'lorry' : 'car'}`;
+      seen[name] = (seen[name] || 0) + 1;
+      return seen[name] > 1 ? `${name} ${seen[name]}` : name;
+    });
+  }
+  const capitalise = (text) => text[0].toUpperCase() + text.slice(1);
+
+  // Where a vehicle sits, in columns A to F and rows 1 to 6.
+  function where(i, p) {
     const v = vehicles[i];
-    const kind = i === 0 ? 'Red car' : v.len === 3 ? 'Truck' : 'Car';
-    const dir = v.horiz ? 'left and right' : 'up and down';
-    return `${kind}, moves ${dir}. Use arrow keys to slide.`;
+    const col = (c) => 'ABCDEF'[c];
+    return v.horiz
+      ? `row ${v.fixed + 1}, columns ${col(p)} to ${col(p + v.len - 1)}`
+      : `column ${col(v.fixed)}, rows ${p + 1} to ${p + v.len}`;
+  }
+
+  // A slider's value runs the way its arrow keys do: up is higher, so an
+  // up-and-down vehicle's value counts from the bottom.
+  const toValue = (i, p) => (vehicles[i].horiz ? p : Solver.SIZE - vehicles[i].len - p);
+  function sync(i) {
+    const lane = els[i].querySelector('.lane');
+    lane.value = toValue(i, pos[i]);
+    lane.setAttribute('aria-valuetext', where(i, pos[i]));
+    lane.disabled = solved;
   }
 
   function box(v, p) {
@@ -166,9 +205,11 @@
       history.push({ vehicle: i, from, to: p });
     }
     place(i, p);
+    sync(i);
     clearHint();
     updateHud();
     if (Solver.isSolved(pos)) win();
+    else haptic.tap();
   }
 
   function undo() {
@@ -176,8 +217,10 @@
     const m = history.pop();
     pos[m.vehicle] = m.from;
     place(m.vehicle, m.from);
+    sync(m.vehicle);
     clearHint();
     updateHud();
+    announce(`Undone. ${capitalise(vehicleNames()[m.vehicle])} back to ${where(m.vehicle, m.from)}.`);
   }
 
   function reset() {
@@ -191,7 +234,6 @@
     e.preventDefault();
     const el = els[i];
     el.setPointerCapture(e.pointerId);
-    el.focus({ preventScroll: true });
     const [lo, hi] = Solver.range(vehicles, pos, i);
     drag = {
       i,
@@ -214,8 +256,13 @@
     if (!drag || e.pointerId !== drag.id) return;
     const v = vehicles[drag.i];
     const delta = (v.horiz ? e.clientX - drag.x : e.clientY - drag.y) / drag.cell;
-    drag.at = Math.max(drag.lo, Math.min(drag.hi, drag.start + delta));
+    const wanted = drag.start + delta;
+    drag.at = Math.max(drag.lo, Math.min(drag.hi, wanted));
     place(drag.i, drag.at);
+    // A nudge when the vehicle is pushed up against something.
+    const pushing = wanted < drag.lo - 0.1 || wanted > drag.hi + 0.1;
+    if (pushing && !drag.pushing) haptic.bump();
+    drag.pushing = pushing;
   }
 
   function onPointerUp(e) {
@@ -230,21 +277,30 @@
     commit(i, Math.round(at));
   }
 
-  function onKey(e, i) {
+  // Arrow keys across a vehicle's lane do nothing; along it, the slider
+  // moves as usual and onSlide takes over.
+  function onLaneKey(e, i) {
+    const across = vehicles[i].horiz ? ['ArrowUp', 'ArrowDown'] : ['ArrowLeft', 'ArrowRight'];
+    if (across.includes(e.key)) e.preventDefault();
+  }
+
+  // The slider moved (key, swipe or screen reader): slide as far towards
+  // it as the lane allows.
+  function onSlide(i) {
     if (solved) return;
     const v = vehicles[i];
-    const step = {
-      ArrowLeft: v.horiz ? -1 : 0,
-      ArrowRight: v.horiz ? 1 : 0,
-      ArrowUp: v.horiz ? 0 : -1,
-      ArrowDown: v.horiz ? 0 : 1,
-    }[e.key];
-    if (step === undefined) return;
-    e.preventDefault();
-    if (!step) return;
+    const lane = els[i].querySelector('.lane');
+    const wanted = toValue(i, Number(lane.value)); // same sum both ways
     const [lo, hi] = Solver.range(vehicles, pos, i);
-    const p = pos[i] + step;
-    if (p >= lo && p <= hi) commit(i, p);
+    const p = Math.max(lo, Math.min(hi, wanted));
+    if (p === pos[i]) {
+      sync(i);
+      haptic.bump();
+      const way = v.horiz ? (wanted > p ? 'right' : 'left') : wanted > p ? 'down' : 'up';
+      announce(`Blocked. The ${vehicleNames()[i]} can’t move ${way}.`);
+      return;
+    }
+    commit(i, p);
   }
 
   // ---- Hints ----
@@ -264,7 +320,7 @@
     els[m.vehicle].classList.add('hint');
     hint = { vehicle: m.vehicle, ghost };
     hintsUsed++;
-    setHelp('Slide the flashing vehicle to the dashed outline.');
+    setHelp(`Hint: slide the ${vehicleNames()[m.vehicle]} to ${where(m.vehicle, m.to)}, the dashed outline.`);
   }
 
   function clearHint() {
@@ -375,6 +431,8 @@
     if (!hintsUsed && (!prev || moves < prev)) progress.best[key] = moves;
     save();
 
+    vehicles.forEach((v, i) => sync(i));
+    haptic.win();
     const red = els[0];
     red.classList.add('leaving');
     red.style.left = Solver.SIZE * UNIT + 4 + '%';
@@ -392,6 +450,7 @@
     const last = level === LEVELS.length - 1;
     $('win-next').textContent = last ? 'Back to level 1' : 'Next level';
 
+    announce(`${$('win-title').dataset.text}. ${text.replace(/\n/g, ' ')}`);
     setTimeout(() => {
       $('win').hidden = false;
       startWinWave();
@@ -421,6 +480,40 @@
   function setHelp(text) {
     $('help').textContent = text;
   }
+
+  // Say something to screen reader users without moving focus. Clearing
+  // first means the same words are read again if they repeat.
+  function announce(text) {
+    const el = $('announce');
+    el.textContent = '';
+    requestAnimationFrame(() => (el.textContent = text));
+  }
+
+  // Haptics: a tap when a vehicle settles, a nudge when it's pushed into
+  // something, a buzz for a win. Android has the Vibration API. iPhones
+  // don't, but Safari (iOS 18 and later) gives a light tap when a switch
+  // control is toggled, so a hidden one stands in.
+  const haptic = (() => {
+    if (navigator.vibrate) {
+      return {
+        tap: () => navigator.vibrate(8),
+        bump: () => navigator.vibrate(18),
+        win: () => navigator.vibrate([20, 70, 20, 70, 40]),
+      };
+    }
+    if (!('switch' in HTMLInputElement.prototype)) return { tap() {}, bump() {}, win() {} };
+    const label = document.createElement('label');
+    label.setAttribute('aria-hidden', 'true');
+    label.style.display = 'none';
+    label.innerHTML = '<input type="checkbox" switch tabindex="-1">';
+    document.body.appendChild(label);
+    const tick = () => label.click();
+    return {
+      tap: tick,
+      bump: tick,
+      win: () => [0, 110, 220].forEach((t) => setTimeout(tick, t)),
+    };
+  })();
 
   function renderCards() {
     const groups = $('card-groups');
@@ -466,6 +559,7 @@
     const panels = [...echoes, main].map((k) => {
       const el = document.createElement('div');
       el.className = 'wipe';
+      el.setAttribute('aria-hidden', 'true');
       el.style.background = `var(--tier${k})`;
       document.body.appendChild(el);
       return el;

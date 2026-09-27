@@ -4,6 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Gridlock</title>
+<meta name="description" content="Slide the cars and lorries until the red car can drive out.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="Gridlock">
+<meta name="theme-color" content="#e4e8ec" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14171b" media="(prefers-color-scheme: dark)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Special+Gothic:wdth,wght@75..125,400..700&display=swap">
@@ -18,7 +25,7 @@
 
   <section class="play">
     <div class="board-wrap">
-      <div class="board" id="board" tabindex="-1" aria-label="Parking grid, 6 by 6">
+      <div class="board" id="board" tabindex="-1" role="group" aria-label="Parking grid, 6 by 6">
         <div class="grid" id="grid"></div>
         <div class="exit" aria-hidden="true"><span>EXIT</span></div>
       </div>
@@ -39,7 +46,8 @@
       <button type="button" id="reset" class="btn">Reset</button>
       <button type="button" id="hint" class="btn">Hint</button>
     </div>
-    <p class="help" id="help">Drag a vehicle along its lane. Get the red car to the exit.</p>
+    <p class="help" id="help" aria-live="polite">Drag a vehicle along its lane. Get the red car to the exit.</p>
+    <p class="sr-only" id="announce" aria-live="polite"></p>
   </section>
 
   <section class="cards" aria-labelledby="cards-title">
@@ -51,5 +59,9 @@
 <script src="js/levels.js"></script>
 <script src="js/vehicles.js"></script>
 <script src="js/game.js"></script>
+<script>
+  // Offline support once installed (over https, or locally for testing).
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) navigator.serviceWorker.register('sw.js');
+</script>
 </body>
 </html>
