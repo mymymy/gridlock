@@ -12,7 +12,9 @@
 //
 // The hardest tier needs more search than this script can do in its time
 // budget, so those levels come from tools/hard-boards.txt, which
-// tools/search.js fills over longer runs.
+// tools/search.js fills over longer runs. Its 51-move board, the hardest
+// there is, comes from Michael Fogleman's exhaustive search
+// (https://github.com/fogleman/rush, MIT licence).
 //
 // Usage: node tools/generate.js [seed] [--keep]
 //   --keep  keep levels already in js/levels.js and only search for missing ones
@@ -30,7 +32,7 @@ const TARGETS = [
   15, 16, 16, 17, 18, 18, 19, 20, 20, 21, // Advanced (15-21)
   22, 23, 25, 26, 27, 29, 30, 31, 33, 34, // Expert (22-34)
   35, 35, 35, 36, 36, 37, 38, 39, 40, 41, // Grand Master (35-41)
-  42, 42, 43, 44, 45, 46, 46, 46, 47, 49, // Legend (42+), from tools/hard-boards.txt
+  42, 43, 44, 45, 46, 46, 46, 47, 49, 51, // Legend (42+), from tools/hard-boards.txt
 ];
 const RANDOM_BUDGET_MS = 20000;
 const TIME_BUDGET_MS = 600000;

@@ -52,7 +52,6 @@ window.GRIDLOCK_LEVELS = [
   { board: 'BB.C..D..CEEDFAAGHDFIIGHJJK.GLMMKNNL', minMoves: 40 },
   { board: 'BCDD.EBCFFGEHAAIGJH.KI.JH.KLLLMMNNN.', minMoves: 41 },
   { board: '..BBCCDDE..FAAEG.FH.IGJJH.IKKLHMMNNL', minMoves: 42 },
-  { board: 'BCDDE.BC..EFBAAGHF..IGHJ..IKKJLLLMMJ', minMoves: 42 },
   { board: 'BBC.DD..C.EEAAF..GH.FIIGHJJK.LHMMK.L', minMoves: 43 },
   { board: 'BBBCCD.....DEAA..DEFGGHHEFIJKKLLIJ..', minMoves: 44 },
   { board: 'B..CCCB.DDDEAAFGHEIIFGHE...JKK.LLJ..', minMoves: 45 },
@@ -61,4 +60,5 @@ window.GRIDLOCK_LEVELS = [
   { board: 'B.CCCDBEEFGDAAHFGIJJHKGI...KLL.MMNN.', minMoves: 46 },
   { board: 'BBC.DDEEC.FGH.AAFGHIIIFGH..JKKLL.JMM', minMoves: 47 },
   { board: 'BBBCDEFGGCDEF.AADEHHI....JI.KK.JLLMM', minMoves: 49 },
+  { board: 'BCDDE.BCF.EGB.FAAGHHHI.G..JIKKLLJMM.', minMoves: 51 },
 ];

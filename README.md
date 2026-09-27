@@ -42,6 +42,6 @@ npm run bundle        # write dist/index.html
 
 ## Next steps
 
-- Harder still. Legend tops out at 49 moves. Every 6 × 6 board has been checked, and the hardest needs 51.
+- More Legend levels near the top. Every 6 × 6 board has been checked and the hardest needs 51 moves; level 60 is that board, from [Michael Fogleman’s Rush Hour database](https://www.michaelfogleman.com/rush/) ([code](https://github.com/fogleman/rush), MIT licence). Our own search has reached 49.
 - Walls (fixed blocks). With one wall the hardest board needs 60 moves.
 - Hand-picked difficulty tiers and a larger set of levels.
