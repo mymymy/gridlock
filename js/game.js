@@ -2,10 +2,11 @@
 (function () {
   'use strict';
 
-  const RH = window.RushHour;
-  const LEVELS = window.RUSH_HOUR_LEVELS;
-  const UNIT = 100 / RH.SIZE; // one cell as a percentage of the grid
-  const STORE_KEY = 'rush-hour-progress-v1';
+  const Solver = window.Solver;
+  const LEVELS = window.GRIDLOCK_LEVELS;
+  const UNIT = 100 / Solver.SIZE; // one cell as a percentage of the grid
+  const STORE_KEY = 'gridlock-progress-v1';
+  const OLD_STORE_KEY = 'rush-hour-progress-v1';
 
   const $ = (id) => document.getElementById(id);
   const gridEl = $('grid');
@@ -25,7 +26,9 @@
   // ---- Storage (per-browser convenience only; the game works without it) ----
   function load() {
     try {
-      return JSON.parse(localStorage.getItem(STORE_KEY)) || { best: {}, level: 0 };
+      // Carry over progress saved under the key used before the rename.
+      const saved = localStorage.getItem(STORE_KEY) || localStorage.getItem(OLD_STORE_KEY);
+      return JSON.parse(saved) || { best: {}, level: 0 };
     } catch (e) {
       return { best: {}, level: 0 };
     }
@@ -51,7 +54,7 @@
     level = Math.max(0, Math.min(LEVELS.length - 1, n));
     progress.level = level;
     save();
-    const parsed = RH.parse(LEVELS[level].board);
+    const parsed = Solver.parse(LEVELS[level].board);
     vehicles = parsed.vehicles;
     pos = parsed.pos;
     startPos = pos.slice();
@@ -114,10 +117,10 @@
   const ROOF_SHIFT = 18; // largest roof shift, in hundredths of a cell
   function shade(i, p, body) {
     const v = vehicles[i];
-    const half = RH.SIZE / 2;
+    const half = Solver.SIZE / 2;
     const cx = v.horiz ? p + v.len / 2 : v.fixed + 0.5;
     const cy = v.horiz ? v.fixed + 0.5 : p + v.len / 2;
-    const height = (gridEl.clientWidth / RH.SIZE) * 0.1;
+    const height = (gridEl.clientWidth / Solver.SIZE) * 0.1;
     const dx = ((cx - half) / half) * height;
     const dy = ((cy - half) / half) * height;
     const walls = [];
@@ -146,7 +149,7 @@
   }
 
   // ---- Moves ----
-  // Sliding the same vehicle twice in a row counts as one move, as on the real board.
+  // Sliding the same vehicle twice in a row counts as one move.
   function commit(i, p) {
     if (p === pos[i]) {
       place(i, p);
@@ -164,7 +167,7 @@
     place(i, p);
     clearHint();
     updateHud();
-    if (RH.isSolved(pos)) win();
+    if (Solver.isSolved(pos)) win();
   }
 
   function undo() {
@@ -188,7 +191,7 @@
     const el = els[i];
     el.setPointerCapture(e.pointerId);
     el.focus({ preventScroll: true });
-    const [lo, hi] = RH.range(vehicles, pos, i);
+    const [lo, hi] = Solver.range(vehicles, pos, i);
     drag = {
       i,
       id: e.pointerId,
@@ -197,7 +200,7 @@
       start: pos[i],
       lo,
       hi,
-      cell: gridEl.clientWidth / RH.SIZE,
+      cell: gridEl.clientWidth / Solver.SIZE,
       at: pos[i],
     };
     el.classList.add('dragging');
@@ -238,7 +241,7 @@
     if (step === undefined) return;
     e.preventDefault();
     if (!step) return;
-    const [lo, hi] = RH.range(vehicles, pos, i);
+    const [lo, hi] = Solver.range(vehicles, pos, i);
     const p = pos[i] + step;
     if (p >= lo && p <= hi) commit(i, p);
   }
@@ -247,7 +250,7 @@
   function showHint() {
     if (solved) return;
     clearHint();
-    const solution = RH.solve(vehicles, pos);
+    const solution = Solver.solve(vehicles, pos);
     if (!solution) {
       setHelp('No way out from here. Undo a few moves or reset the level.');
       return;
@@ -353,7 +356,7 @@
 
     const red = els[0];
     red.classList.add('leaving');
-    red.style.left = RH.SIZE * UNIT + 4 + '%';
+    red.style.left = Solver.SIZE * UNIT + 4 + '%';
 
     const kind = moves === shortest ? 'shortest' : 'longer';
     const fill = (line) =>

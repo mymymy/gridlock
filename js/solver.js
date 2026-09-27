@@ -1,7 +1,7 @@
-// Rush Hour board model and breadth-first solver.
+// Gridlock board model and breadth-first solver.
 // A board is a 36-character string, row by row: '.' is empty, 'A' is the red
 // car (always horizontal on the exit row), any other letter is a vehicle.
-// Works in the browser (window.RushHour) and in Node (module.exports).
+// Works in the browser (window.Solver) and in Node (module.exports).
 (function (root) {
   'use strict';
 
@@ -129,5 +129,5 @@
 
   const api = { SIZE, EXIT_ROW, GOAL_COL, parse, stringify, occupancy, range, neighbours, isSolved, key, solve };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
-  else root.RushHour = api;
+  else root.Solver = api;
 })(typeof window !== 'undefined' ? window : globalThis);

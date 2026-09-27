@@ -1,6 +1,6 @@
 # Gridlock
 
-A browser sliding-block puzzle in the style of Rush Hour. Slide cars and trucks along their lanes until the red car can drive out of the exit on the right.
+A browser sliding-block puzzle. Slide cars and trucks along their lanes until the red car can drive out of the exit on the right.
 
 ## Play
 
@@ -8,7 +8,7 @@ Play online at https://mymymy.github.io/rush-hour/ or open `index.html` in a bro
 
 - 50 levels: ten each at Beginner, Intermediate, Advanced, Expert and Grand Master.
 - Drag a vehicle to slide it. Keyboard: Tab to a vehicle, then use the arrow keys.
-- Sliding the same vehicle twice in a row counts as one move, as on the real board.
+- Sliding the same vehicle twice in a row counts as one move.
 - **Hint** shows the next move on a shortest route from where you are.
 - **Undo** (or Ctrl/Cmd+Z) and **Reset** work as you’d expect.
 - Your best score for each level is saved in this browser. Solves that used a hint don’t count towards your best.
@@ -40,6 +40,6 @@ npm run bundle        # write dist/index.html
 
 ## Next steps
 
-- Harder still. The hardest known Rush Hour position needs 51 moves; the generator currently tops out around 44 in its time budget.
+- Harder still. The hardest known position on a 6 × 6 board needs 51 moves; the generator currently tops out around 44 in its time budget.
 - Hand-picked difficulty tiers and a larger set of levels.
 - Walls (fixed blocks), as in some expansion packs.
