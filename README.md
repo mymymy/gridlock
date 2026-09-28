@@ -7,6 +7,7 @@ A browser sliding-block puzzle. Slide cars and trucks along their lanes until th
 Play online at https://mymymy.github.io/gridlock/ or open `index.html` in a browser. There’s no build step and no dependencies.
 
 - 90 levels: fifteen each at Beginner, Intermediate, Advanced, Expert, Master and Grand Master.
+- A daily puzzle, the same for everyone each day. It gets harder through the week, from 8–10 moves on Mondays to 30–34 on Sundays, and counts your streak of days in a row.
 - Drag a vehicle to slide it. Keyboard: Tab to a vehicle, then use the arrow keys.
 - Sliding the same vehicle twice in a row counts as one move.
 - **Hint** shows the next move on a shortest route from where you are.
@@ -22,10 +23,12 @@ Play online at https://mymymy.github.io/gridlock/ or open `index.html` in a brow
 | --- | --- |
 | `js/solver.js` | Board model and breadth-first solver. Works in the browser and Node. |
 | `js/levels.js` | The levels, each with the fewest moves that solve it. Generated. |
+| `js/daily.js` | Two years of daily puzzles from 28 September 2026, each with its fewest moves. Generated. |
 | `js/vehicles.js` | Top-down car and truck artwork, drawn as single-colour moulded plastic. |
 | `js/game.js` | Rendering, drag and keyboard input, move counting, hints, progress. |
 | `tools/generate.js` | Makes `js/levels.js`. Explores every position reachable from a layout and picks one at a chosen distance from a solution. Easy levels come from random layouts; hard ones from hill climbing (add, remove or move a vehicle, keep the change if the puzzle gets no easier). Expert, Master and Grand Master levels mostly come from `tools/hard-boards.txt`. Takes up to 10 minutes. |
 | `tools/search.js` | A longer hunt for very hard boards. Scores each layout by its hardest puzzle over every position the vehicles can take, climbs by adding and removing vehicles, and saves every puzzle of 42 moves or more (or a lower threshold you give it) to `tools/hard-boards.txt`. Runs on one core for as long as you ask. |
+| `tools/daily.js` | Makes `js/daily.js`. Easier days come from random layouts, harder ones from a pool made by `tools/search.js` with a low threshold; each is checked with the solver and none repeats a level or another day. |
 | `sw.js`, `manifest.webmanifest`, `icons/` | Offline support and home-screen install. The deploy stamps each release into the service worker so installed copies update. `tools/icons.js` renders the icons: a close-up of level 1’s red car. |
 | `tools/bundle.js` | Inlines everything into a single `dist/index.html`. |
 
@@ -41,6 +44,7 @@ Every push to `main` runs the tests and publishes the game to GitHub Pages (`.gi
 npm test              # solver tests and a minimum-moves check on every level
 npm run generate      # regenerate levels (optional seed: npm run generate -- 7)
 npm run search -- 600 # hunt for very hard boards for 600 seconds
+node tools/search.js 300 77 18 pool.txt && node tools/daily.js pool.txt  # remake the daily puzzles
 npm run bundle        # write dist/index.html
 ```
 

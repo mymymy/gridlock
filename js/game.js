@@ -11,7 +11,8 @@
   const $ = (id) => document.getElementById(id);
   const gridEl = $('grid');
 
-  let level = 0;
+  let level = 0; // the level in the list; the daily puzzle doesn't change it
+  let puzzle = null; // what's on the board: { board, minMoves, daily?, date? }
   let vehicles = [];
   let pos = [];
   let startPos = [];
@@ -50,12 +51,43 @@
   ];
   const tier = (minMoves) => TIERS.find((t) => minMoves <= t.upTo);
 
+  // ---- Daily puzzle ----
+  // The same puzzle for everyone each day, from js/daily.js. Days count from
+  // the file's start in local time; after the last puzzle they repeat.
+  const DAILY = window.GRIDLOCK_DAILY;
+  const dayKey = (d) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const longDate = (d) => d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+  function dailyFor(date) {
+    const [y, m, d] = DAILY.start.split('-').map(Number);
+    const days = Math.round((Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) - Date.UTC(y, m - 1, d)) / 86400000);
+    const count = DAILY.puzzles.length;
+    const [board, minMoves] = DAILY.puzzles[((days % count) + count) % count];
+    return { board, minMoves, daily: dayKey(date), date };
+  }
+  // Days in a row with the daily puzzle solved, up to today (or yesterday,
+  // if today's isn't done yet).
+  function streak() {
+    const done = progress.daily || {};
+    const d = new Date();
+    if (!done[dayKey(d)]) d.setDate(d.getDate() - 1);
+    let n = 0;
+    for (; done[dayKey(d)]; d.setDate(d.getDate() - 1)) n++;
+    return n;
+  }
+
   // ---- Level setup ----
   function startLevel(n) {
     level = Math.max(0, Math.min(LEVELS.length - 1, n));
     progress.level = level;
     save();
-    const parsed = Solver.parse(LEVELS[level].board);
+    startPuzzle(LEVELS[level]);
+  }
+  const startDaily = () => startPuzzle(dailyFor(new Date()));
+
+  function startPuzzle(p) {
+    puzzle = p;
+    const parsed = Solver.parse(puzzle.board);
     vehicles = parsed.vehicles;
     pos = parsed.pos;
     startPos = pos.slice();
@@ -70,7 +102,7 @@
     setHelp('Drag a vehicle along its lane. Get the red car to the exit.');
     $('board').setAttribute(
       'aria-label',
-      `Level ${level + 1}, ${tier(LEVELS[level].minMoves).name}. ${vehicles.length} vehicles. ` +
+      `${puzzle.daily ? `Daily puzzle for ${longDate(puzzle.date)}` : `Level ${level + 1}`}, ${tier(puzzle.minMoves).name}. ${vehicles.length} vehicles. ` +
         'Columns A to F run left to right and rows 1 to 6 top to bottom. The exit is on the right of row 3. ' +
         'Tab to a vehicle to hear where it is, then use the arrow keys, or swipe up and down, to slide it.'
     );
@@ -225,7 +257,7 @@
 
   function reset() {
     if (!history.length && !solved) return;
-    startLevel(level);
+    startPuzzle(puzzle);
   }
 
   // ---- Input ----
@@ -400,7 +432,7 @@
   // Wave letters: the face takes the current level's colour, so the
   // extrusions cycle through the other level colours.
   function waveColours() {
-    const current = tier(LEVELS[level].minMoves).cls.slice(1);
+    const current = tier(puzzle.minMoves).cls.slice(1);
     return TIERS.map((t) => t.cls.slice(1)).filter((k) => k !== current).map((k) => `var(--tier${k})`);
   }
   function paintWave(el) {
@@ -425,10 +457,12 @@
   function win() {
     solved = true;
     const moves = history.length;
-    const shortest = LEVELS[level].minMoves;
-    const key = LEVELS[level].board;
+    const shortest = puzzle.minMoves;
+    const key = puzzle.board;
     const prev = progress.best[key];
     if (!hintsUsed && (!prev || moves < prev)) progress.best[key] = moves;
+    // A daily puzzle counts towards the streak however it was solved.
+    if (puzzle.daily) (progress.daily = progress.daily || {})[puzzle.daily] = true;
     save();
 
     vehicles.forEach((v, i) => sync(i));
@@ -448,7 +482,7 @@
     $('win-title-text').textContent = $('win-title').dataset.text;
     $('win-body').textContent = text;
     const last = level === LEVELS.length - 1;
-    $('win-next').textContent = last ? 'Back to level 1' : 'Next level';
+    $('win-next').textContent = puzzle.daily ? 'Back to the levels' : last ? 'Back to level 1' : 'Next level';
 
     announce(`${$('win-title').dataset.text}. ${text.replace(/\n/g, ' ')}`);
     setTimeout(() => {
@@ -462,11 +496,11 @@
 
   // ---- HUD ----
   function updateHud() {
-    const L = LEVELS[level];
+    const L = puzzle;
     const t = tier(L.minMoves);
     document.documentElement.style.setProperty('--level-ink', `var(--${t.cls.replace('t', 'tier')}-ink)`);
     paintWave(document.querySelector('.brand-word'));
-    $('card-name').textContent = `Level ${level + 1} of ${LEVELS.length}`;
+    $('card-name').textContent = L.daily ? 'Today’s puzzle' : `Level ${level + 1} of ${LEVELS.length}`;
     $('tier').textContent = t.name;
     $('moves').textContent = history.length;
     const best = progress.best[L.board];
@@ -515,7 +549,24 @@
     };
   })();
 
+  function renderDaily() {
+    const p = dailyFor(new Date());
+    const t = tier(p.minMoves);
+    const done = !!(progress.daily && progress.daily[p.daily]);
+    const days = streak();
+    const b = $('daily');
+    b.className = `daily-btn ${t.cls}${done ? ' done' : ''}`;
+    if (puzzle && puzzle.daily === p.daily) b.setAttribute('aria-current', 'true');
+    else b.removeAttribute('aria-current');
+    const state = (done ? 'Solved' : 'Not solved yet') + (days > 1 ? ` · ${days}-day streak` : '');
+    b.innerHTML =
+      `<span class="daily-title">Today’s puzzle</span>` +
+      `<span class="daily-meta">${longDate(p.date)} · ${t.name}</span>` +
+      `<span class="daily-state">${state}</span>`;
+  }
+
   function renderCards() {
+    renderDaily();
     const groups = $('card-groups');
     groups.textContent = '';
     for (const t of TIERS) {
@@ -535,16 +586,19 @@
 
   const STAR = '<svg class="star" viewBox="0 0 100 100" aria-hidden="true"><polygon points="50.0,5.0 62.3,36.0 95.7,38.2 70.0,59.5 78.2,91.8 50.0,74.0 21.8,91.8 30.0,59.5 4.3,38.2 37.7,36.0" stroke-linejoin="round"/></svg>';
 
-  // Moving to a new level (from the list or the result panel): a panel in the
-  // level's colour wipes up the screen (the way the page scrolls back). While
-  // it covers the page the level loads and the page returns to the board;
-  // then it lifts off the top with echoes in the other level colours
-  // trailing behind it.
+  // Moving to a new level or the daily puzzle (from the list or the result
+  // panel): a panel in the puzzle's colour wipes up the screen (the way the
+  // page scrolls back). While it covers the page the puzzle loads and the
+  // page returns to the board; then it lifts off the top with echoes in the
+  // other level colours trailing behind it. target is a level index or 'daily'.
   let wiping = false;
-  function goToLevel(n) {
+  function goTo(target) {
     if (wiping) return;
+    const daily = target === 'daily';
+    const p = daily ? dailyFor(new Date()) : LEVELS[target];
     const arrive = () => {
-      startLevel(n);
+      if (daily) startDaily();
+      else startLevel(target);
       window.scrollTo(0, 0);
       $('board').focus({ preventScroll: true });
     };
@@ -553,7 +607,7 @@
       return;
     }
     wiping = true;
-    const main = tier(LEVELS[n].minMoves).cls.slice(1);
+    const main = tier(p.minMoves).cls.slice(1);
     const echoes = TIERS.map((t) => t.cls.slice(1)).filter((k) => k !== main);
     // Echoes first so the main colour paints on top of them.
     const panels = [...echoes, main].map((k) => {
@@ -576,7 +630,10 @@
     // so it stays still on screen while the panel reveals and hides it.
     const number = document.createElement('div');
     number.className = 'wipe-number';
-    number.innerHTML = `<span class="wipe-label">Level</span><span class="wipe-digits">${n + 1}</span>`;
+    // The daily puzzle shows the day of the month.
+    number.innerHTML = daily
+      ? `<span class="wipe-label">Daily</span><span class="wipe-digits">${p.date.getDate()}</span>`
+      : `<span class="wipe-label">Level</span><span class="wipe-digits">${target + 1}</span>`;
     mainPanel.appendChild(number);
     const HOLD = 250; // time fully covered, to read the number
     const down = 'translateY(-100%)', under = 'translateY(100%)';
@@ -607,13 +664,13 @@
     const perfect = best && best <= L.minMoves;
     if (best) b.classList.add('done');
     if (perfect) b.classList.add('perfect');
-    if (n === level) b.setAttribute('aria-current', 'true');
+    if (n === level && !(puzzle && puzzle.daily)) b.setAttribute('aria-current', 'true');
     // The tile shows only the level number; fill means solved, a star means
     // solved in the fewest possible moves.
     b.innerHTML = `${perfect ? STAR : ''}<span class="n">${n + 1}</span>`;
     const state = perfect ? ', solved in the fewest moves' : best ? ', solved' : '';
     b.setAttribute('aria-label', `Level ${n + 1}, ${tier(L.minMoves).name}${state}`);
-    b.addEventListener('click', () => goToLevel(n));
+    b.addEventListener('click', () => goTo(n));
     li.appendChild(b);
     return li;
   }
@@ -629,7 +686,11 @@
   $('undo').addEventListener('click', undo);
   $('reset').addEventListener('click', reset);
   $('hint').addEventListener('click', showHint);
-  $('win-next').addEventListener('click', () => goToLevel(level === LEVELS.length - 1 ? 0 : level + 1));
+  // From the daily puzzle, back to the level you were on.
+  $('win-next').addEventListener('click', () =>
+    goTo(puzzle.daily ? level : level === LEVELS.length - 1 ? 0 : level + 1)
+  );
+  $('daily').addEventListener('click', () => goTo('daily'));
   document.addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
       e.preventDefault();

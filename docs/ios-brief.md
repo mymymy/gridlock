@@ -114,6 +114,18 @@ Tiers by `minMoves`, with their colours:
 - Progress (best moves per level, keyed by board string, and the current
   level) in UserDefaults or SwiftData. No accounts, no tracking, no ads.
 
+## Daily puzzle
+
+`js/daily.js` holds two years of daily puzzles from 28 September 2026, as
+`[board, minMoves]`; the day's puzzle is the one at (days since `start`, in
+local time) modulo the list length. Difficulty rises Monday to Sunday.
+Bundle it like the levels. A 'Today's puzzle' tile sits above the level list
+(date, tier, solved or not, and a streak of consecutive days once it reaches
+two); playing it uses the level wipe with 'Daily' and the day of the month,
+and 'Back to the levels' returns to the level you were on. A solve counts
+towards the streak even with hints, but only hint-free solves set a best.
+`js/game.js` (`dailyFor`, `streak`, `renderDaily`) is the reference.
+
 ## Not yet
 
 No sound, no sharing, no ads. The price model (99p, or free with a one-off

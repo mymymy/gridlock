@@ -518,6 +518,26 @@ button { font: inherit; color: inherit; }
 .card-btn.done { background: var(--tier-c); border-color: var(--tier-c); color: #fff; }
 .card-btn.done.t2 { color: #1d2126; }
 .card-btn.done[aria-current="true"] { border-color: var(--ink); }
+/* Today's puzzle: a wide tile in its difficulty's colour, filled once solved. */
+.daily-btn {
+  width: 100%;
+  display: grid;
+  gap: 2px;
+  padding: 12px 14px;
+  text-align: left;
+  border: 1.5px solid var(--rule);
+  border-top: 5px solid var(--tier-c);
+  border-radius: 8px;
+  background: var(--panel);
+  cursor: pointer;
+}
+.daily-title { font-size: 17px; font-weight: 800; }
+.daily-meta, .daily-state { font-size: 14px; color: var(--muted); }
+.daily-btn[aria-current="true"] { border-color: var(--ink); border-top-color: var(--tier-c); }
+.daily-btn.done { background: var(--tier-c); border-color: var(--tier-c); color: #fff; }
+.daily-btn.done .daily-meta, .daily-btn.done .daily-state { color: inherit; opacity: 0.85; }
+.daily-btn.done.t2 { color: #1d2126; }
+.daily-btn.done[aria-current="true"] { border-color: var(--ink); }
 .t1 { --tier-c: var(--tier1); }
 .t2 { --tier-c: var(--tier2); }
 .t3 { --tier-c: var(--tier3); }
@@ -531,6 +551,7 @@ button { font: inherit; color: inherit; }
 .stats dt,
 .cards h2,
 .btn,
+.daily-title,
 .card-group h3 span:first-child { font-stretch: 125%; }
 
 @media (prefers-reduced-motion: reduce) {

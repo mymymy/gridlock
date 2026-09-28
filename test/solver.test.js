@@ -44,3 +44,20 @@ test('every level is solvable in exactly its minimum moves', () => {
     assert.strictEqual(Solver.solve(vehicles, pos).length, minMoves, board);
   }
 });
+
+test('every daily puzzle is solvable in exactly its minimum moves, and none repeats', () => {
+  // The levels file may already be loaded (and cached) by the test above.
+  global.window = global.window || {};
+  require('../js/levels.js');
+  require('../js/daily.js');
+  const { start, puzzles } = global.window.GRIDLOCK_DAILY;
+  assert.match(start, /^\d{4}-\d{2}-\d{2}$/);
+  assert.ok(puzzles.length >= 365);
+  const seen = new Set(global.window.GRIDLOCK_LEVELS.map((l) => l.board));
+  for (const [board, minMoves] of puzzles) {
+    assert.ok(!seen.has(board), `repeated: ${board}`);
+    seen.add(board);
+    const { vehicles, pos } = Solver.parse(board);
+    assert.strictEqual(Solver.solve(vehicles, pos).length, minMoves, board);
+  }
+});

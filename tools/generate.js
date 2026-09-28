@@ -312,4 +312,5 @@ function main() {
   console.log(`Wrote ${levels.length} levels in ${((Date.now() - started) / 1000).toFixed(1)}s`);
 }
 
-main();
+if (require.main === module) main();
+else module.exports = { rng, randomLayout, distances, relabel };
