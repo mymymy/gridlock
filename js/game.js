@@ -630,9 +630,10 @@
     // so it stays still on screen while the panel reveals and hides it.
     const number = document.createElement('div');
     number.className = 'wipe-number';
-    // The daily puzzle shows the day of the month.
+    // The daily puzzle shows the date, with the month below the day.
+    const month = daily && p.date.toLocaleDateString('en-GB', { month: 'long' });
     number.innerHTML = daily
-      ? `<span class="wipe-label">Daily</span><span class="wipe-digits">${p.date.getDate()}</span>`
+      ? `<span class="wipe-label">Daily</span><span class="wipe-digits">${p.date.getDate()}</span><span class="wipe-label">${month}</span>`
       : `<span class="wipe-label">Level</span><span class="wipe-digits">${target + 1}</span>`;
     mainPanel.appendChild(number);
     const HOLD = 250; // time fully covered, to read the number
