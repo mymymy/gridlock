@@ -249,6 +249,9 @@ button { font: inherit; color: inherit; }
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
+/* A label under the number (the daily puzzle's month) sits a little lower,
+   so the ink gap matches the one between the label above and the number. */
+.wipe-digits + .wipe-label { margin-top: 0.13em; }
 #board:focus { outline: none; }
 .sr-only {
   position: absolute;
